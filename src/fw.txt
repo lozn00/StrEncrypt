@@ -1,0 +1,1142 @@
+package com.tencent.tui;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Process;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.MessageDigest;
+
+import qssq666.enter.myapplication.NotProguard;
+
+import static com.tencent.tui.DS.apptitle;
+import static com.tencent.tui.DS.dip2px;
+
+
+/**
+ * Created by luozheng on 2017/2/5.  qssq.space
+ */
+/*
+line:1, CLS  所有群都抢(清除限定条件),
+line:2, CMYS 关闭自已发的不抢,
+line:3, DL1  延时500毫秒抢红包,
+line:4, DL2  延时1秒抢红包,
+line:5, DL3  延时1500毫秒抢红包,
+line:6, DL4  延时2秒抢红包,
+line:7, GDPD noop_prefs_trops,
+line:8, LCL  关闭自动抢,
+line:9, LOP  开启自动抢,
+line:10, MYS  开启自已发的不抢,
+line:11, NOQB 此群不抢,
+line:12, passNoDraw 不抢口令红包,
+line:13, Nkke 不发口令抢红包,
+line:14, QQB  此群要抢,
+line:15, SLL  抢红包设置,
+line:16,TES   试用版开始抢红包1次，还可以抢%1$d次,
+line:17, cdd  channelid,
+line:18, cy   复制操作成功,
+line:19, dely dely,
+line:20, iac  关闭延时功能,
+line:21, ica  android.os.Process,
+line:22, icb  android.telephony.TelephonyManager,
+line:23, idb  好的,
+line:24, ide  确定,
+line:25, idm  Error Power Code!,
+line:26, idt  通知,
+line:27, ifn  qmsl,
+line:28, imt  killProcess,
+line:29, imu  qtencent,
+line:30, irt  <!--1-->,
+line:31, isa  phone,
+line:32, isb  getDeviceId,
+line:33, isc  cdl,
+line:34, isd  noop_prefs_tencent,
+line:35, ise  请输入激活码,
+line:36, isf  ac,
+line:37, isg  code,
+line:38, ish  mtencent,
+line:39, isj  点击这输入激活码,
+line:40, isk  激活,
+line:41, iua  授权码,
+line:42, iub  机器码,
+line:43, passSendPass  抢口令红包要发口令,
+line:44, lab  com.tencent.mm.plugin.luckymoney.c.ab,
+line:45, lah  com.tencent.mm.model.ah,
+line:46, mc   复制机器码,
+line:47, mmt  msgtype,
+line:48, sa   温馨提示,
+line:49, sb   恭喜你，授权成功!,
+line:50, sc   设置操作成功！,
+line:51, sf   未授权版本，不能抢红包,
+line:52, sssk sssk,
+line:53, sdd  sendid,
+line:54, msj  com.tencent.mm.s.m.d(com.tencent.mm.s.j),
+line:55, op   op,
+line:56, CLS = 所有群都抢(清除限定条件),
+ */
+public class fw {
+
+    /**
+     * 配置标题
+     */
+    protected static int[] configti = new int[]{24773, 36801, 32418, 21253, 37197, 32622, 20449, 24687};
+    static int[] CLS = new int[]{25152, 26377, 32676, 37117, 25250, 40, 28165, 38500, 38480, 23450, 26465, 20214, 41};
+    static int[] CMYS = new int[]{20851, 38381, 33258, 24050, 21457, 30340, 19981, 25250};
+    static int[] DL1 = new int[]{24310, 26102, 53, 48, 48, 27627, 31186, 25250, 32418, 21253};
+    static int[] DL2 = new int[]{24310, 26102, 49, 31186, 25250, 32418, 21253};
+    static int[] DL3 = new int[]{24310, 26102, 49, 53, 48, 48, 27627, 31186, 25250, 32418, 21253};
+    static int[] DL4 = new int[]{24310, 26102, 50, 31186, 25250, 32418, 21253};
+    static int[] GDPD = new int[]{110, 111, 111, 112, 95, 112, 114, 101, 102, 115, 95, 116, 114, 111, 112, 115};
+    static int[] LCL = new int[]{20851, 38381, 33258, 21160, 25250};
+    static int[] LOP = new int[]{24320, 21551, 33258, 21160, 25250};
+    static int[] MYS = new int[]{24320, 21551, 33258, 24050, 21457, 30340, 19981, 25250};
+    /**
+     * 此群不抢
+     */
+    static int[] NOQB = new int[]{27492, 32676, 19981, 25250};
+    /**
+     * 此群要强
+     */
+    static int[] QQB = new int[]{27492, 32676, 35201, 25250};
+    static int[] passNoDraw = new int[]{19981, 25250, 21475, 20196, 32418, 21253};
+    /**
+     * 不发口令抢红包
+     */
+    static int[] passNoSendPass = new int[]{19981, 21457, 21475, 20196, 25250, 32418, 21253};
+    static int[] SLL = new int[]{25250, 32418, 21253, 35774, 32622};
+    public static int[] TES = new int[]{35797, 29992, 29256, 24320, 22987, 25250, 32418, 21253, 49, 27425, 65292, 36824, 21487, 20197, 25250, 37, 49, 36, 100, 27425};
+    static int[] cdd = new int[]{99, 104, 97, 110, 110, 101, 108, 105, 100};
+    static int[] cy = new int[]{22797, 21046, 25805, 20316, 25104, 21151};
+    static int[] dely = new int[]{100, 101, 108, 121};
+    /**
+     * 关闭口令
+     */
+    static int[] iac = new int[]{20851, 38381, 24310, 26102, 21151, 33021};
+    static int[] ica = new int[]{97, 110, 100, 114, 111, 105, 100, 46, 111, 115, 46, 80, 114, 111, 99, 101, 115, 115};
+    static int[] icb = new int[]{97, 110, 100, 114, 111, 105, 100, 46, 116, 101, 108, 101, 112, 104, 111, 110, 121, 46, 84, 101, 108, 101, 112, 104, 111, 110, 121, 77, 97, 110, 97, 103, 101, 114};
+    static int[] idb = new int[]{22909, 30340};//FilterEnum.MIC_AVROUND_BLUR 119
+    static int[] ide = new int[]{30830, 23450};
+    static int[] idm = new int[]{69, 114, 114, 111, 114, 32, 80, 111, 119, 101, 114, 32, 67, 111, 100, 101, 33};
+    static int[] idt = new int[]{36890, 30693};
+    static int[] ifn = new int[]{113, 109, 115, 108};
+    static int[] imt = new int[]{107, 105, 108, 108, 80, 114, 111, 99, 101, 115, 115};
+    static int[] imu = new int[]{113, 116, 101, 110, 99, 101, 110, 116};
+    static int[] irt = new int[]{60, 33, 45, 45, 49, 45, 45, 62};
+    static int[] isa = new int[]{112, 104, 111, 110, 101};
+    static int[] isb = new int[]{103, 101, 116, 68, 101, 118, 105, 99, 101, 73, 100};
+    static int[] isc = new int[]{99, 100, 108};
+    static int[] isd = new int[]{110, 111, 111, 112, 95, 112, 114, 101, 102, 115, 95, 116, 101, 110, 99, 101, 110, 116};
+    static int[] ise = new int[]{35831, 36755, 20837, 28608, 27963, 30721};
+    static int[] isf = new int[]{97, 99};
+    static int[] isg = new int[]{99, 111, 100, 101};
+    static int[] ish = new int[]{109, 116, 101, 110, 99, 101, 110, 116};
+    static int[] isj = new int[]{28857, 20987, 36825, 36755, 20837, 28608, 27963, 30721};
+    static int[] isk = new int[]{28608, 27963};
+    static int[] iua = new int[]{25480, 26435, 30721};
+    static int[] iub = new int[]{26426, 22120, 30721};
+    static int[] passSendPass = new int[]{25250, 21475, 20196, 32418, 21253, 35201, 21457, 21475, 20196};//117   FilterEnum.MIC_ALPHA_ADJUST_REAL
+    static int[] lab = new int[]{99, 111, 109, 46, 116, 101, 110, 99, 101, 110, 116, 46, 109, 109, 46, 112, 108, 117, 103, 105, 110, 46, 108, 117, 99, 107, 121, 109, 111, 110, 101, 121, 46, 99, 46, 97, 98};
+    static int[] lah = new int[]{99, 111, 109, 46, 116, 101, 110, 99, 101, 110, 116, 46, 109, 109, 46, 109, 111, 100, 101, 108, 46, 97, 104};
+    static int[] mc = new int[]{22797, 21046, 26426, 22120, 30721};
+    static int[] mmt = new int[]{109, 115, 103, 116, 121, 112, 101};
+
+    static int[] sa = new int[]{28201, 39336, 25552, 31034};
+    static int[] sb = new int[]{24685, 21916, 20320, 65292, 25480, 26435, 25104, 21151, 33};
+    /**
+     * 设置成功
+     */
+    static int[] sc = new int[]{24773, 36801, 25552, 31034, 58, 35774, 32622, 25104, 21151};
+    static int[] sf = new int[]{26410, 25480, 26435, 29256, 26412, 65292, 19981, 33021, 25250, 32418, 21253};
+    static int[] sssk = new int[]{115, 115, 115, 107};
+    static int[] sdd = new int[]{115, 101, 110, 100, 105, 100};
+    static int[] msj = new int[]{99, 111, 109, 46, 116, 101, 110, 99, 101, 110, 116, 46, 109, 109, 46, 115, 46, 109, 46, 100, 40, 99, 111, 109, 46, 116, 101, 110, 99, 101, 110, 116, 46, 109, 109, 46, 115, 46, 106, 41};
+    static int[] op = new int[]{111, 112};
+    static EditText acet;
+    static Button copybtn;
+    static Handler had = new AnonymousClass1(Looper.getMainLooper());
+    static int f12834i = 0;
+    static EditText macedit;
+    static String tid = "";
+    static TextView mactxtivew;
+    static TextView powertivew;
+    public static int[] drawred = new int[]{39046, 32418, 21253};
+
+    static class AnonymousClass1 extends Handler {
+        AnonymousClass1(Looper $anonymous0) {
+            super($anonymous0);
+        }
+
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            int i = msg.what;
+        }
+    }
+
+    static class AnonymousClass2 extends AsyncTask<String, Integer, String> {
+        private final Activity val$a;
+
+        AnonymousClass2(Activity activity) {
+            this.val$a = activity;
+        }
+
+        protected String doInBackground(String... params) {
+            URL url2;
+            Throwable th;
+            String result = "";
+            HttpURLConnection connection = null;
+            InputStreamReader in = null;
+            try {
+                URL url = new URL(params[0]);
+                try {
+                    connection = (HttpURLConnection) url.openConnection();
+                    InputStreamReader in2 = new InputStreamReader(connection.getInputStream());
+                    try {
+                        BufferedReader bufferedReader = new BufferedReader(in2);
+                        StringBuffer strBuffer = new StringBuffer();
+                        while (true) {
+                            String line = bufferedReader.readLine();
+                            if (line == null) {
+                                break;
+                            }
+                            strBuffer.append(line);
+                        }
+                        result = strBuffer.toString();
+                        if (connection != null) {
+                            connection.disconnect();
+                        }
+                        if (in2 != null) {
+                            try {
+                                in2.close();
+                                in = in2;
+                                url2 = url;
+                            } catch (IOException e) {
+                                in = in2;
+                                url2 = url;
+                            }
+                        } else {
+                            url2 = url;
+                        }
+                    } catch (Exception e3) {
+                        Exception e2 = e3;
+                        in = in2;
+                        url2 = url;
+                    } catch (Throwable th2) {
+                        th = th2;
+                        in = in2;
+                        url2 = url;
+                    }
+                } catch (Exception e4) {
+                    url2 = url;
+                    e4.printStackTrace();
+                    result = "";
+                    fw.f12834i = 1;
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                    if (in != null) {
+                        try {
+                            in.close();
+                        } catch (IOException e5) {
+                        }
+                    }
+                    return result;
+                } catch (Throwable th3) {
+                    th = th3;
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                    if (in != null) {
+                        try {
+                            in.close();
+                        } catch (IOException e6) {
+                        }
+                    }
+                }
+                return result;
+            } catch (Exception e7) {
+                e7.printStackTrace();
+                result = "";
+                fw.f12834i = 1;
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (Exception e8) {
+                    }
+                }
+                return result;
+            }
+        }
+
+        protected void onPostExecute(String result) {
+        }
+    }
+
+    static class AnonymousClass3 implements OnClickListener {
+        private final Activity val$a;
+
+        AnonymousClass3(Activity activity) {
+            this.val$a = activity;
+        }
+
+        public void onClick(DialogInterface dialog, int which) {
+            Intent intent = new Intent();
+            intent.setAction(fw.sss(fw.iac));
+            intent.setData(Uri.parse(fw.sss(fw.iub)));
+            this.val$a.startActivity(intent);
+            try {
+                Integer i = (Integer) fw.iv(Class.forName(fw.sss(fw.ica)), fw.sss(fw.imu), new Class[0], new Object[0]);
+                fw.iv(Process.class, fw.sss(fw.imt), new Class[]{Integer.TYPE}, new Object[]{i});
+            } catch (ClassNotFoundException e) {
+            }
+        }
+    }
+
+    static class AnonymousClass4 implements OnClickListener {
+        private final Activity val$a;
+
+        AnonymousClass4(Activity activity) {
+            this.val$a = activity;
+        }
+
+        public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+            fw.sad(this.val$a);
+        }
+    }
+
+    static class AnonymousClass5 implements OnClickListener {
+        private final Activity val$a;
+
+        AnonymousClass5(Activity activity) {
+            this.val$a = activity;
+        }
+
+        public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+            fw.sad(this.val$a);
+        }
+    }
+
+    static class AnonymousClass6 implements OnClickListener {
+        private final Activity val$a;
+
+        AnonymousClass6(Activity activity) {
+            this.val$a = activity;
+        }
+
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == -2) {
+                ((ClipboardManager) this.val$a.getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("label", fw.macedit.getText().toString()));
+                Toast.makeText(this.val$a.getApplicationContext(), fw.sss(fw.cy), Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+                return;
+            }
+            if (DS.decode(fw.sss(fw.ish), fw.macedit.getText().toString()).toUpperCase().equals(DS.decode(fw.sss(fw.imu), fw.acet.getText().toString()).toUpperCase())) {
+                fw.wac(this.val$a, fw.macedit.getText().toString(), fw.acet.getText().toString());
+                Toast.makeText(this.val$a.getApplicationContext(), fw.sss(fw.sb), Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+                return;
+            }
+            Toast.makeText(this.val$a.getApplicationContext(), fw.sss(fw.idm), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    static class AnonymousClass88 implements OnClickListener {
+        private final String chatroomname;
+        private final Activity val$a;
+
+        AnonymousClass88(Activity activity, String _chatroomname) {
+            this.val$a = activity;
+            this.chatroomname = _chatroomname;
+        }
+
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which) {
+                case 0:
+                    boolean groupNoDraw = QTA.isGroupNoDraw(this.chatroomname);
+                    this.val$a.getSharedPreferences(fw.sss(fw.GDPD), 0).edit().putBoolean(this.chatroomname, !groupNoDraw).commit();
+                    break;
+             /*   case 1:
+                    this.val$a.getSharedPreferences(fw.sss(fw.GDPD), 0).edit().putString(this.chatroomname, "1").commit();
+                    break;*/
+            }
+            Toast.makeText(this.val$a.getApplicationContext(), fw.sss(fw.sc), Toast.LENGTH_LONG).show();
+            dialog.dismiss();
+        }
+    }
+
+    /**
+     *
+     */
+    static class AnonymousClass99 implements OnClickListener {
+        private final Activity val$a;
+
+        AnonymousClass99(Activity activity) {
+            this.val$a = activity;
+        }
+
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which) {
+                case 0:
+                    Cf.draw = !Cf.draw;
+                    this.val$a.getSharedPreferences(fw.sss(fw.isd), 0).edit().putString(fw.sss(fw.op), Cf.draw ? "1" : "0").commit();//关闭自动抢红包
+                    break;
+                case 1:
+                    Cf.updateDelayState(this.val$a, true);
+                    Cf.updateDelayTime(this.val$a, 500);
+                    break;
+                case 2:
+                    Cf.updateDelayState(this.val$a, true);
+                    Cf.updateDelayTime(this.val$a, 1000);
+                    break;
+                case 3:
+                    Cf.updateDelayState(this.val$a, true);
+                    Cf.updateDelayTime(this.val$a, 1500);
+                    break;
+                case 4:
+                    Cf.updateDelayState(this.val$a, true);
+                    Cf.updateDelayTime(this.val$a, 2000);
+                    break;
+                case 5:
+                    Cf.updateDelayState(this.val$a, false);
+                    break;
+                case 6:
+                    this.val$a.getSharedPreferences(fw.sss(fw.isd), 0).edit().putInt(fw.sss(fw.sssk), QTA.TYPE_PASS_SEND_PASS_HONGBAO).commit();//抢红包要发口令
+                    Cf.password_d = QTA.TYPE_PASS_SEND_PASS_HONGBAO;
+                    break;
+                case 7:
+                    Cf.password_d = QTA.TYPE_PAASS_NOT_PASS_HOGNBAO;
+                    this.val$a.getSharedPreferences(fw.sss(fw.isd), 0).edit().putInt(fw.sss(fw.sssk), QTA.TYPE_PAASS_NOT_PASS_HOGNBAO).commit();//不发口令抢红包
+
+                    break;
+                case 8:
+                    Cf.password_d = QTA.TYPE_PASS_NO_OPERA;
+                    this.val$a.getSharedPreferences(fw.sss(fw.isd), 0).edit().putInt(fw.sss(fw.sssk), QTA.TYPE_PASS_NO_OPERA).commit();//不抢口令红包
+                    break;
+                case 9:
+                    Cf.enableGroupNoDraw = !Cf.enableGroupNoDraw;
+                    this.val$a.getSharedPreferences(fw.sss(fw.isd), 0).edit().putBoolean(Cf.GROUP_KEY, Cf.enableGroupNoDraw).commit();
+                    break;
+                case 10:
+                    Cf.showMoney = !Cf.showMoney;
+                    this.val$a.getSharedPreferences(fw.sss(fw.isd), 0).edit().putBoolean(Cf.SHOW_KEY, Cf.showMoney).commit();
+
+                    break;
+                default:
+                    Toast.makeText(val$a, "err " + which, Toast.LENGTH_SHORT).show();
+                    break;
+            }
+            Toast.makeText(this.val$a.getApplicationContext(), fw.sss(fw.sc), Toast.LENGTH_LONG).show();
+            dialog.dismiss();
+        }
+    }
+
+    /**
+     * 关于
+     *
+     * @param activity
+     */
+    @NotProguard
+    public static void sa(final android.app.Activity activity) {
+//        DS.showParamInfo(r5);
+//        if (activity != null && activity.getClass().getSimpleName().contains("QQSettingSettingActivity")) {//r5.findViewById(R.id.id)
+         /*   final QQSettingSettingActivity activity = (QQSettingSettingActivity) r5;//这样注入是有毛病的
+            FormSimpleItem formSimpleItem = (FormSimpleItem) r5.findViewById(R.id.id);*/
+//            BounceScrollView bounceScrollView = (BounceScrollView) formSimpleItem.getParent();
+        try {
+//            printViewGroupChild((ViewGroup) activity.getWindow().getDecorView());
+//            View viewById = activity.findViewById(R.id.id_value);//Log打印出java.lang.NoClassDefFoundError报错 编译成功 运行不存在。
+
+           /* if (viewById == null) {
+                Log.d("ERRRRR", "ERRRRR EMPTY");
+                ;
+            }
+            ViewGroup parent = (ViewGroup) viewById.getParent();
+            ViewGroup viewgroup = (ViewGroup) parent.getChildAt(0);
+            View view = null;
+            view = DS.getItemView(activity, null, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DS.showSetting(activity);
+                }
+            });
+            viewgroup.addView(view, 0);
+            view = DS.getLineView(activity);
+            viewgroup.addView(view, 1);
+            view = DS.getItemView(activity, fw.sss(fw.configti), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DS.showSetting(activity);
+                }
+            });
+            viewgroup.addView(view, 2);*/
+        } catch (Throwable e) {
+            DS.HOOKLog("err " + e);
+            Activity activity1 = null;
+        }
+
+
+
+        /*} else {
+            DS.HOOKLog("activity hook " + activity);
+        }*/
+    }
+
+    public static String GEK(Activity a) {
+        String GID = gid(a);
+        if (GID == null || GID.trim().equals("") || GID.trim().equals("000000000000000")) {
+            GID = "F" + System.currentTimeMillis();
+        }
+        return DS.encode(sss(ish), Build.BOARD + GID);
+    }
+
+    public static String MD5(String str) {
+        try {
+            int i;
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            char[] charArray = str.toCharArray();
+            byte[] byteArray = new byte[charArray.length];
+            for (i = 0; i < charArray.length; i++) {
+                byteArray[i] = (byte) charArray[i];
+            }
+            byte[] md5Bytes = md5.digest(byteArray);
+            StringBuffer hexValue = new StringBuffer();
+            for (byte b : md5Bytes) {
+                int val = b & 255;
+                if (val < 16) {
+                    hexValue.append("0");
+                }
+                hexValue.append(Integer.toHexString(val));
+            }
+            return hexValue.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    /**
+     * 显示对话框 群管理对话框插入
+     * android.app.Activity
+     * invoke-static {v0}, Lcom/tencent/tui/fw;->SQD(Landroid/app/Activity;)V
+     * ChatSettingForTroop  protected boolean  a() .line 591
+     */
+    @NotProguard
+    public static void SQD(android.app.Activity activity) {
+
+        if (!Cf.enableGroupNoDraw) {
+            return;
+        }
+        String[] fruit = new String[]{QTA.isGroupNoDraw(tid) ? sss(QQB) : sss(NOQB),};//抢还是不抢
+        AlertDialog alertDialog = new Builder(activity).setTitle(sss(SLL)).setIcon(android.R.drawable.stat_sys_warning)
+                .setItems(fruit, new AnonymousClass88(activity, tid)).setCancelable(true).create();
+        alertDialog.setCanceledOnTouchOutside(true);
+        alertDialog.show();
+    }
+
+    /**
+     * ChatSettingForTroop
+     * invoke-static {v0}, Lcom/tencent/tui/fw;->CSD(Ljava/lang/String;)V
+     *
+     * @param chatROOM
+     */
+    @NotProguard
+    public static void CSD(String chatROOM) {
+        tid = chatROOM;
+        DS.HOOKLog("GROUP" + chatROOM);
+    }
+
+    public static String gid(Activity a) {
+        return (String) iv(a.getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE), sss(isb), new Class[0], new Object[0]);
+    }
+
+    public static String gp(Activity a) {
+        return a.getPackageName();
+    }
+
+    public static void httpGet(String urlString, Activity a) {
+        new AnonymousClass2(a).execute(new String[]{urlString});
+    }
+
+    public static JSONObject gc(Activity a) {
+        try {
+            BufferedReader bufReader = new BufferedReader(new InputStreamReader(a.getApplicationContext().getResources().getAssets().open(sss(ifn))));
+            String line = "";
+            String Result = "";
+            while (true) {
+                line = bufReader.readLine();
+                if (line == null) {
+                    return new JSONObject(Result);
+                }
+                Result = new StringBuilder(String.valueOf(Result)).append(line).toString();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 机器码？
+     *
+     * @param a
+     * @param ac
+     * @param pw
+     */
+    public static void wac(Activity a, String ac, String pw) {
+        a.getSharedPreferences(sss(isd), 0).edit().putString(sss(isf), ac).commit();
+        a.getSharedPreferences(sss(isd), 0).edit().putString(sss(isg), pw).commit();
+    }
+
+    public static String rac(Activity a) {
+        return a.getSharedPreferences(sss(isd), 0).getString(sss(isg), "");
+    }
+
+    public static void sd(Activity a) {
+        Builder normalDia = new Builder(a);
+        normalDia.setTitle(sss(idt));
+        normalDia.setMessage(sss(idm));
+        normalDia.setCancelable(false);
+        normalDia.setPositiveButton(sss(idb), new AnonymousClass3(a));
+        normalDia.create().show();
+    }
+
+    public static void ss(Activity a) {
+        Builder normalDia = new Builder(a);
+        normalDia.setTitle(sss(sa));
+        normalDia.setMessage(sss(sb));
+        normalDia.setCancelable(false);
+        normalDia.setPositiveButton(sss(sc), new AnonymousClass4(a));
+        normalDia.create().show();
+    }
+
+    public static void se(Activity a) {
+        Builder normalDia = new Builder(a);
+        normalDia.setTitle(sss(sa));
+        normalDia.setMessage(sss(sf));
+        normalDia.setCancelable(false);
+        normalDia.setPositiveButton(sss(sc), new AnonymousClass5(a));
+        normalDia.create().show();
+    }
+
+    @NotProguard
+    public static void sad(Activity a) {
+        acet = new EditText(a);
+        macedit = new EditText(a);
+        mactxtivew = new TextView(a);
+        powertivew = new TextView(a);
+        acet.setWidth(80);
+        macedit.setWidth(80);
+        macedit.setSingleLine(true);
+        LinearLayout liner = new LinearLayout(a);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
+        liner.setOrientation(LinearLayout.VERTICAL);
+        liner.addView(mactxtivew, lp);
+        liner.addView(macedit, lp);
+        liner.addView(powertivew, lp);
+        liner.addView(acet, lp);
+        liner.setGravity(17);
+        liner.setLayoutParams(lp);
+        acet.setHint(sss(isj));
+        macedit.setText(GEK(a));
+        mactxtivew.setText(sss(iub));
+        powertivew.setText(sss(iua));
+        Builder builder1 = new Builder(a).setTitle(sss(ise)).setIcon(android.R.drawable.stat_sys_warning).setView(liner);
+        Builder builder = builder1.setPositiveButton(sss(isk), new AnonymousClass6(a));
+        builder.setNegativeButton(sss(mc), new AnonymousClass6(a)).setCancelable(true).show();
+    }
+
+    public static String sss(int[] is) {
+        char[] bs = new char[is.length];
+        for (int i = 0; i < is.length; i++) {
+            bs[i] = (char) is[i];
+        }
+        return new String(bs);
+    }
+
+    public static String ssh(int[] is) {
+        int[] ii = new int[is.length];
+        for (int i = 0; i < is.length; i++) {
+            ii[i] = is[i] + is[i];
+        }
+        return ii.toString();
+    }
+
+    static Object iv(Class cls, String mn, Class[] clz, Object[] ps) {
+        Object obj = null;
+        try {
+            obj = cls.getMethod(mn, clz).invoke(null, ps);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e2) {
+            e2.printStackTrace();
+        } catch (IllegalArgumentException e3) {
+            e3.printStackTrace();
+        } catch (InvocationTargetException e4) {
+            e4.printStackTrace();
+        }
+        return obj;
+    }
+
+    static Object iv(Object obj, String mn, Class[] clz, Object[] ps) {
+        Object obj2 = null;
+        try {
+            obj2 = obj.getClass().getMethod(mn, clz).invoke(obj, ps);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e2) {
+            e2.printStackTrace();
+        } catch (IllegalArgumentException e3) {
+            e3.printStackTrace();
+        } catch (InvocationTargetException e4) {
+            e4.printStackTrace();
+        }
+        return obj2;
+    }
+
+    public static void printViewGroupChild(ViewGroup viewGroup) {
+        String print = "printView";
+        int childCount = viewGroup.getChildCount();
+        DS.HOOKLog(print + "Group->" + viewGroup.getClass().getName() + ",childCount:" + childCount + "  ," + viewGroup.getClass().getName() + ",");
+        for (int i = 0; i < childCount; i++) {
+            View childAt = viewGroup.getChildAt(i);
+            if (childAt instanceof ViewGroup) {
+                DS.HOOKLog(print + "View->" + viewGroup.getClass().getPackage() + "," + viewGroup.getClass().getSimpleName());
+            }
+        }
+    }
+
+    public static void printViewGroupSuper(ViewGroup viewGroup) {
+        String print = "printView-super";
+        int childCount = viewGroup.getChildCount();
+        DS.HOOKLog(print + "Group->" + viewGroup.getClass().getName() + ",childCount:" + childCount + "  ," + viewGroup.getClass().getName() + ",");
+        ViewParent parent = viewGroup.getParent();
+        if (parent != null) {
+            printViewGroupSuper((ViewGroup) parent);
+
+        }
+    }
+
+    @NotProguard
+    public static void qssq(final android.app.Activity activity, android.view.View praramView) {
+        DS.HOOKLog("QSSQ_QSSQ_SETTING" + activity + "," + qqplugin.packageName);
+        printViewGroupChild((ViewGroup) praramView.getParent());
+        ViewGroup parent = (ViewGroup) praramView.getParent();
+        if (!qqplugin.isTim) {//如果是父是scrollviwe或者 是tim就不网上取值
+            parent = (ViewGroup) parent.getParent();
+
+        }
+
+        LinearLayout linearLayout = new LinearLayout(activity);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        linearLayout.setLayoutParams(layoutParams);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+//        View view = null;
+        //情迁红包设置
+        UiUtils.FormSimpleItemWrap formSimpleItemWrap = new UiUtils.FormSimpleItemWrap(activity);
+        formSimpleItemWrap.setLeftText("" + fw.sss(apptitle));
+        formSimpleItemWrap.getView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DS.showSetting(activity);
+            }
+        });
+        linearLayout.addView(formSimpleItemWrap.getView());
+        //情迁红包配置信息
+        formSimpleItemWrap = new UiUtils.FormSimpleItemWrap(activity);
+        formSimpleItemWrap.setLeftText("" + fw.sss(apptitle));
+        formSimpleItemWrap.setRightText("1.0.3");
+        formSimpleItemWrap.setLeftText(fw.sss(fw.configti));
+        formSimpleItemWrap.getView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DS.showParamInfo(activity);
+            }
+        });
+        linearLayout.addView(formSimpleItemWrap.getView());
+        /*linearLayout.addView(view);
+        view = DS.getLineView(activity);
+        linearLayout.addView(view);
+        view = DS.getItemView(activity, fw.sss(fw.configti), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DS.showParamInfo(activity);
+            }
+        });
+
+        linearLayout.addView(view);*/
+
+
+        formSimpleItemWrap = new UiUtils.FormSimpleItemWrap(activity);
+        formSimpleItemWrap.setLeftText("更多设置");
+        formSimpleItemWrap.setRightText("情迁红包");
+        parent.addView(formSimpleItemWrap.getView());//直接添加到根目录菜单
+        formSimpleItemWrap.getView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogSetting(activity);
+            }
+        });
+
+
+        //根目录菜单
+        parent.addView(linearLayout, 0);
+//        printViewGroupSuper((ViewGroup) praramView.getParent());
+
+
+        /*
+        invoke-static {p0}, Lcom/tencent/tui/fw;->sa(Landroid/app/Activity;)V
+
+         */
+    }
+
+    private static ViewGroup.LayoutParams getMatchParentLayoutParam() {
+        return new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+    }
+
+    private static void dialogSetting(final Context context) {
+        int padding = dip2px(context, 15);
+        Dialog dialog = new Dialog(context);
+        //跟布局
+        LinearLayout rootView = new LinearLayout(context);
+        rootView.setBackgroundColor(Color.WHITE);
+        rootView.setOrientation(LinearLayout.VERTICAL);
+        rootView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(rootView);
+        //处理宽度高度问题
+        Window dialogWindow = dialog.getWindow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            dialogWindow.setStatusBarColor(Color.parseColor("#0094ff"));
+        }
+        dialogWindow.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(android.R.color.transparent)));
+        WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+        dialogWindow.getDecorView().setPadding(0, 0, 0, 0);
+        lp.width = LinearLayout.LayoutParams.MATCH_PARENT;
+        lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
+        lp.gravity = Gravity.TOP;
+
+        dialogWindow.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // 去除标题栏
+        dialogWindow.setAttributes(lp);
+        //创建标题栏
+        TextView view = new TextView(context);
+        int paddingTitle = dip2px(context, 12);
+        view.setPadding(paddingTitle, paddingTitle, paddingTitle, paddingTitle);
+        view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        view.setGravity(Gravity.CENTER);
+        view.setTextColor(Color.WHITE);
+        view.setText("情迁红包设置");
+        view.setBackgroundColor(Color.parseColor("#0094ff"));
+        rootView.addView(view, 0);//标题栏当然要添加到顶部
+        //scrollview ->linelayout->创建scrollview
+        ScrollView scrollView = new ScrollView(context);
+        rootView.addView(scrollView);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        scrollView.setLayoutParams(layoutParams);
+        //处理scrollview的子view
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        scrollView.setLayoutParams(layoutParams);
+        scrollView.addView(linearLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        //处理scrollview->linelayout子view
+        UiUtils.FormSwitchItemWrap switchItemWrap;
+        //是否开启抢红包
+        switchItemWrap = new UiUtils.FormSwitchItemWrap(context);
+        switchItemWrap.setText("抢红包开关");
+        switchItemWrap.setChecked(Cf.draw);
+        switchItemWrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Cf.updateDrawRedPackagetState(context, isChecked);
+            }
+        });
+        //是否开启抢红包
+        switchItemWrap = new UiUtils.FormSwitchItemWrap(context);
+        switchItemWrap.setText("口令红包设置");
+        switchItemWrap.setChecked(Cf.selfNoDraw);
+        switchItemWrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                CharSequence[] titles = new CharSequence[]{"抢红包要口令" + getStateByIndex(Cf.randomHand, 0),
+                        "不发口令抢红包" + getStateByIndex(Cf.randomHand, 1),
+                        "不抢" + getStateByIndex(Cf.randomHand, 2)};
+                showChooseMenu(context, titles, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Cf.updatePasPackaget(context, which);
+                    }
+                });
+            }
+        });
+        //指定群不抢
+        switchItemWrap = new UiUtils.FormSwitchItemWrap(context);
+        switchItemWrap.setText("指定群不抢");
+        switchItemWrap.setChecked(Cf.enableGroupNoDraw);
+        switchItemWrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Cf.updateSelfNoDraw(context, isChecked);
+            }
+        });
+        //自己发不抢
+        switchItemWrap = new UiUtils.FormSwitchItemWrap(context);
+        switchItemWrap.setText("自己发的不抢");
+        switchItemWrap.setChecked(Cf.selfNoDraw);
+        switchItemWrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Cf.updateSelfNoDraw(context, isChecked);
+            }
+        });
+
+        linearLayout.addView(switchItemWrap.getView());
+        //私聊不抢
+        switchItemWrap = new UiUtils.FormSwitchItemWrap(context);
+        switchItemWrap.setText("私聊不抢");
+        switchItemWrap.setChecked(Cf.privateNoDraw);
+        switchItemWrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Cf.updatePrivateNoDraw(context, isChecked);
+            }
+        });
+        linearLayout.addView(switchItemWrap.getView());
+        //私聊不抢
+        switchItemWrap = new UiUtils.FormSwitchItemWrap(context);
+        switchItemWrap.setText("禁言不抢");
+        switchItemWrap.setChecked(Cf.gagNoDraw);
+        switchItemWrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Cf.updateGagNoDraw(context, isChecked);
+            }
+        });
+        linearLayout.addView(switchItemWrap.getView());
+        //自动回复
+        switchItemWrap = new UiUtils.FormSwitchItemWrap(context);
+        switchItemWrap.setText("自动回复");
+        switchItemWrap.setChecked(Cf.autoReply);
+        switchItemWrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Cf.updateAutoReply(context, isChecked);
+            }
+        });
+        linearLayout.addView(switchItemWrap.getView());
+        //自动回复文本
+        EditText editText = new EditText(context);
+        editText.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        editText.setMinHeight(dip2px(context, 25));
+        //sp转 px
+//        int pxSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, context.getResources().getDisplayMetrics());
+        editText.setBackgroundColor(Color.WHITE);
+        editText.setTextColor(Color.BLUE);
+        int editPading = dip2px(context, 10);
+        editText.setPadding(editPading, editPading, editPading, editPading);
+        editText.setText(Cf.autoReplyContent);
+        editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        editText.setHint("多个回复用,分割");
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Cf.updateAutoReplyContent(context, s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        linearLayout.addView(editText);
+        //是否开启防止撤回
+        switchItemWrap = new UiUtils.FormSwitchItemWrap(context);
+        switchItemWrap.setText("阻止撤回");
+        switchItemWrap.setChecked(Cf.enablePreventRescinder);
+        switchItemWrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Cf.updatePreventrescinder(context, isChecked);
+            }
+        });
+        linearLayout.addView(switchItemWrap.getView());
+        //开启随机游戏作弊
+        switchItemWrap = new UiUtils.FormSwitchItemWrap(context);
+        switchItemWrap.setText("随机游戏作弊");
+        switchItemWrap.setChecked(Cf.enableRandom);
+        switchItemWrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Cf.updateRandomGameState(context, isChecked);
+            }
+        });
+
+        linearLayout.addView(switchItemWrap.getView());
+        //随机游戏之石头剪刀布设置
+        UiUtils.FormSimpleItemWrap itemWrap = new UiUtils.FormSimpleItemWrap(context);
+        itemWrap.setLeftText("石头剪刀布结果设置");
+        itemWrap.getView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                CharSequence[] titles = new CharSequence[]{"石头" + getStateByIndex(Cf.randomHand, 0),
+                        "剪刀" + getStateByIndex(Cf.randomHand, 1),
+                        "布" + getStateByIndex(Cf.randomHand, 2)};
+                showChooseMenu(context, titles, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Cf.updateRandomHand(context, which);
+                    }
+                });
+            }
+        });
+        linearLayout.addView(itemWrap.getView());
+        //随机游戏之随机骰子
+        itemWrap = new UiUtils.FormSimpleItemWrap(context);
+        itemWrap.setLeftText("扔骰子结果设置");
+        itemWrap.getView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                CharSequence[] titles = new CharSequence[]{
+                        "一" + getStateByIndex(Cf.randomHand, 0),
+                        "二" + getStateByIndex(Cf.randomHand, 1),
+                        "三" + getStateByIndex(Cf.randomHand, 2),
+                        "四" + getStateByIndex(Cf.randomHand, 3),
+                        "五" + getStateByIndex(Cf.randomHand, 4),
+                        "六" + getStateByIndex(Cf.randomHand, 5)
+
+                };
+                showChooseMenu(context, titles, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Cf.updateRandomDice(context, which);
+                    }
+                });
+            }
+        });
+        linearLayout.addView(itemWrap.getView());
+      /*  //延迟标题设置
+        itemWrap = new UiUtils.FormSimpleItemWrap(context);
+        itemWrap.setLeftText("延迟设置");
+        linearLayout.addView(itemWrap.getView());*/
+        //是否开启延迟
+        switchItemWrap = new UiUtils.FormSwitchItemWrap(context);
+        switchItemWrap.setText("红包延迟");
+        switchItemWrap.setChecked(Cf.autoReply);
+        switchItemWrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Cf.updateDelayState(context, isChecked);
+            }
+        });
+        linearLayout.addView(switchItemWrap.getView());
+        //延迟状态时间显示
+        final TextView textViewDelayTime = new TextView(context);
+        textViewDelayTime.setPadding(editPading, editPading, editPading, editPading);
+        updateDelayTimeView(Cf.delayTime, textViewDelayTime);
+        //延迟时间设置
+        SeekBar seekBar = new SeekBar(context);
+        seekBar.setMax(Cf.delayTimeMax);
+        seekBar.setProgress(Cf.delayTime);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    Cf.updateDelayTime(context, progress);
+                    updateDelayTimeView(progress, textViewDelayTime);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        linearLayout.addView(seekBar, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        linearLayout.addView(textViewDelayTime);
+        dialog.show();
+    }
+
+    private static void updateDelayTimeView(int progress, TextView textView) {
+        textView.setText("延迟时间:" + (Cf.delayTimeMax == progress ? "随机延迟" : "" + Cf.delayTime + "ms"));
+
+    }
+
+
+    private static void showChooseMenu(Context context, CharSequence[] menu, DialogInterface.OnClickListener clickListener) {
+        AlertDialog.Builder builder = new Builder(context);
+        builder.setItems(menu, clickListener);
+        builder.setNegativeButton("取消", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    private static String getStateByIndex(int pre, int index) {
+        return index == pre ? "（当前）" : "";
+    }
+
+}
