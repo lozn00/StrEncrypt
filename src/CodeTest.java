@@ -31,9 +31,10 @@ public class CodeTest {
 		temp=  new int[]{40, 26469, 33258, 65329, 65329, 58, 37, 115, 91, 37, 115, 93, 41};*/
 //	temp= new int[]{143496,143496,131076,105980,176,143496,143496,91292,81328,176,143496,143496,89212,143784,176,80160,80160,86856};//content=谢谢老板,谢谢大佬,谢谢土豪,么么哒
 
-temp= new int[]{357,405,405,389,197,397,473,521,537,473,529,533,197,489,529,197,509,513,533,197,529,537,465,465,473,529,529,245,197,397,473,529,517,513,509,529,473,197,465,513,469,473,197,489,529,197};//content=HTTP Request is not success, Response code is 
+temp =new int[]{465,513,505,253,533,473,509,465,473,509,533,253,505,513,461,489,501,473,521,521,253,545,489,469,481,473,533,253,349,513,525,505,401,489,505,517,501,473,361,533,473,505};//content=com.tencent.mobileqq.widget.FormSimpleItem
 
-//		arrayList.add(printCharCode(temp));
+//temp= new int[]{529,473,533,373,473,477,533,405,473,549,533};
+	arrayList.add(printCharCode(temp));
 		// arrayList.add(ByteEncodeUtil.printCharCode(QSSQ_zaicishenmingruanjianshiyongjiu_dou));
 		String tempStr = "";
 		tempStr="A";

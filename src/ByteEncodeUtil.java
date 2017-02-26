@@ -23,7 +23,7 @@ import net.sourceforge.pinyin4j.PinyinHelper;
 
 public class ByteEncodeUtil {
 
-	static HashMap<String, String> filedNameMap = new HashMap<>();
+	static HashMap<String, String> sEncodeMap = new HashMap<>();
 	public static String sConstantsClass = "ConstantValue";
 	public static final String sConstantClassPath = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
 
@@ -35,21 +35,9 @@ public class ByteEncodeUtil {
 	 */
 	private static boolean writeFile = true;
 	/**
-	 * 多个文件共享变量
+	 * 多个文件共享变量 是已经生产的 变量名和机解密的字符串
 	 */
-	static HashMap<String, String> vardNameMap = new HashMap<>();
-
-	static boolean isIgNoreDecodeText(String text) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
-		return isIgNoreDecodeText(text, false);
-	}
-
-	static boolean isIgNoreDecodeText(String text, boolean isdecodeConstants) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
-		if (isdecodeConstants) {
-
-			return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG");
-		}
-		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || (text.contains("final") && text.contains("static"));
-	}
+	static HashMap<String, String> sDecodeMap = new HashMap<>();
 
 	private static final String sIGNORE_DECODE = "IGNORE_DECODE";
 	/*
@@ -73,20 +61,18 @@ public class ByteEncodeUtil {
 	 */
 	public static final String decodeMethodNameReg = ".*?" + decodeMethodName + "\\((.*?)\\)" + ".*?";
 
-	/**
-	 * 解密方法
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public static final String getDecodeMethodNameCall(String name) {
-		return decodeMethodName + "(" + name + ")";
-	}
-
 	private final static String sBrSign = "brbr";
 
 	public static void main(String[] args) {
+		String lineText = "开始\n结束 如果还是换行了说明替换失败";
+		lineText = lineText.replaceAll("\n", sBrSign);
+		System.out.println("解析后替换变量结果" + lineText);
+		// decodeJavaAndroid();
+		// encodeJavaAndroid();
+		debug = true;
+		encodeJavaAndroid();
 		/*
+		 * 
 		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
 		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
 		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
@@ -124,14 +110,7 @@ public class ByteEncodeUtil {
 		// deAndroid();
 		// String file = "F:\\QQ_weichat\\test\\Test.java";
 		// String file = "C:\\Users\\Administrator\\Desktop\\Test.java";
-		String lineText = "开始\n结束 如果还是换行了说明替换失败";
-		lineText = lineText.replaceAll("\n", sBrSign);
-		System.err.println("解析后替换变量结果" + lineText);
 
-		debug = true;
-		// encodeJavaAndroid();
-		// decodeJavaAndroid();
-		encodeJavaAndroid();
 	}
 
 	private static void decodeJavaAndroid() {
@@ -177,8 +156,8 @@ public class ByteEncodeUtil {
 	}
 
 	private static void encodeJavaAndroid() {
-
 		ArrayList<String> list = getFileArrayList();
+		looadDecodeFieldToHashMap(sConstantClassPath, false);
 		readEncodeVarArrayList(list);
 		for (int i = 0; i < list.size(); i++) {
 
@@ -235,6 +214,16 @@ public class ByteEncodeUtil {
 	}
 
 	/**
+	 * 解密方法
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static final String getDecodeMethodNameCall(String name) {
+		return decodeMethodName + "(" + name + ")";
+	}
+
+	/**
 	 * 获取要加密或者解密的文件集合
 	 * 
 	 * @return
@@ -242,26 +231,35 @@ public class ByteEncodeUtil {
 	private static ArrayList<String> getFileArrayList() {
 		String temp = "";
 		ArrayList<String> list = new ArrayList<String>();
-		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
-		list.add(temp);
-		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
-		list.add(temp);
-		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QQUnrecalledHook.java";
-		list.add(temp);
-		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
-		list.add(temp);
-		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
-		list.add(temp);
-		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
-		/*
-		 * list.add(temp); temp =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\TestVar.java";
-		 */
-		list.add(temp);
-		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\qqplugin.java";
-		list.add(temp);
-		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\InitConfig.java";
-		list.add(temp);
+
+		if (false == true) {
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\TestVar.java";
+			list.add(temp);
+		} else {
+
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
+			list.add(temp);
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
+			list.add(temp);
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QQUnrecalledHook.java";
+			list.add(temp);
+
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
+			list.add(temp);
+
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
+			list.add(temp);
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
+
+			list.add(temp);
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\qqplugin.java";
+			list.add(temp);
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\InitConfig.java";
+			list.add(temp);
+		}
+
+		/* */
+
 		return list;
 	}
 
@@ -499,7 +497,14 @@ public class ByteEncodeUtil {
 
 								if (isChinese || checkZimu(temp)) {
 									String baseVar = getVarBaseName(temp, isChinese);
-									if (!filedNameMap.containsKey(baseVar)) {
+									if (!sEncodeMap.containsKey(baseVar)) {
+										if (sDecodeMap.containsKey(baseVar)) {
+											sEncodeMap.put(baseVar, "");
+											if (debug) {
+												System.err.println("解码常量表已定义变量:" + baseVar + ",line:" + temp);
+											}
+											continue;
+										}
 										// 生成注释声明
 										varNameSb.append("/**\n" + temp + "\n*/\n");
 										/*
@@ -510,7 +515,7 @@ public class ByteEncodeUtil {
 										if (debug) {
 											System.out.println("创建字段:" + baseVar + ",value:" + temp);
 										}
-										filedNameMap.put(baseVar, "");
+										sEncodeMap.put(baseVar, "");
 									} else {
 										if (debug) {
 
@@ -524,8 +529,8 @@ public class ByteEncodeUtil {
 				}
 				read.close();
 			} else {
-				System.out.println("找不到指定的文件");
-				throw new RuntimeException("找不到指定的文件");
+				System.out.println("找不到指定的文件" + file.getAbsolutePath());
+				throw new RuntimeException("找不到指定的文件" + filePath);
 			}
 		} catch (Exception e) {
 			System.out.println("读取文件内容出错");
@@ -612,7 +617,7 @@ public class ByteEncodeUtil {
 							}
 							String decodeResult = String.valueOf(chars);
 							System.out.println("varName:" + temp + ",解密结果:" + decodeResult);
-							vardNameMap.put(temp, decodeResult);
+							sDecodeMap.put(temp, decodeResult);
 							if (needReplace) {
 								lineTxt = "////" + sIGNORE_DECODE + lineTxt;// 不进行删除而是进行注释
 							}
@@ -699,11 +704,17 @@ public class ByteEncodeUtil {
 							String matchBase = matcherMethod.group();// 获取匹配航
 							String temp = matcherMethod.group(1);// 把变量名替换即可
 							String varName = temp.replace(sConstantsClass + ".", "");// 触发类名.
-							if (vardNameMap.containsKey(varName)) {
-								String value = vardNameMap.get(varName);
-								lineTxt = lineTxt.replace(decodeMethodName + "(" + temp + ")", "\"" + value + "\"");
-								lineTxt = lineTxt.replaceAll("\n", sBrSign);
-								System.out.println("找到定义变量名：" + temp + "实际变量值:" + value + "\n替换后当前行:" + lineTxt);
+							if (sDecodeMap.containsKey(varName)) {
+								String value = sDecodeMap.get(varName);// 解密后文本在另外一个方法已经处理
+								lineTxt = lineTxt.replace(decodeMethodName + "(" + temp + ")", "\"" + value + "\"");// 对函数进行替换
+								lineTxt = lineTxt.replaceAll("\n", sBrSign);// 处理里的字符串。
+								if (lineTxt.indexOf("\n") != -1) {
+									System.err.println("无法替换\n还是存在");
+								}
+								if (debug) {
+
+									System.out.println("找到定义变量名：" + temp + "实际变量值:" + value + "\n替换后当前行:" + lineTxt);
+								}
 
 							} else {
 
@@ -778,7 +789,7 @@ public class ByteEncodeUtil {
 
 								if (isChinese || checkZimu(temp)) {
 									String baseVar = getVarBaseName(temp, isChinese);
-									if (!filedNameMap.containsKey(baseVar)) {
+									if (!sEncodeMap.containsKey(baseVar)) {
 										// 生成注释声明
 										/*
 										 * 下面这句话实现变量申明字符串
@@ -794,14 +805,13 @@ public class ByteEncodeUtil {
 
 									if (debug) {
 
-										System.err.println("lineTextBefore:" + lineTxt + ",varName:" + baseVar);
+										System.out.println("lineTextBefore:" + lineTxt + ",varName:" + baseVar);
 									}
 
 									lineTxt = lineTxt.replace(matchBase, getDecodeMethodNameCall(sConstantsClass + "." + baseVar));// 把"ffd"替换为
 																																	// 解密方法.sss(常量类.变量名)
 									if (debug) {
-
-										System.err.println("lineTextAfter:" + lineTxt);
+										System.out.println("lineTextAfter:" + lineTxt);
 									}
 								} else {
 									// varNameSb.append("/**忽略" + temp + "
@@ -904,7 +914,7 @@ public class ByteEncodeUtil {
 		for (int i = 0; i < chars.length; i++) {
 			intArray[i] = chars[i];
 			intArray[i] = getEncodeIntValue(intArray[i]);
-			System.out.println("加密前:"+((int)chars[i])+",加密后:"+intArray[i]);
+			System.out.println("加密前:" + ((int) chars[i]) + ",加密后:" + intArray[i]);
 
 		}
 		return intArray;
@@ -927,7 +937,13 @@ public class ByteEncodeUtil {
 	 * @return
 	 */
 	public static String StringToCharCodeJava(String str) {
-		str = str.replaceAll(sBrSign, "\n");// 处理特殊符号转义 如果直接\n那么会读入多行不是吗？
+
+		if (str.indexOf("brbr") != -1) {
+			str = str.replaceAll(sBrSign, "\n");// 处理特殊符号转义 如果直接\n那么会读入多行不是吗？
+			if (debug) {
+				System.err.println("进行编码加密brbr转换为换行符,转换结果:" + str);
+			}
+		}
 		return getIntSvARValue(charArrayToEncodeIntArray(str.toCharArray()));
 	}
 
@@ -954,4 +970,15 @@ public class ByteEncodeUtil {
 		return sbChars.toString();
 	}
 
+	static boolean isIgNoreDecodeText(String text) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
+		return isIgNoreDecodeText(text, false);
+	}
+
+	static boolean isIgNoreDecodeText(String text, boolean isdecodeConstants) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
+		if (isdecodeConstants) {
+
+			return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG");
+		}
+		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || (text.contains("final") && text.contains("static"));
+	}
 }
