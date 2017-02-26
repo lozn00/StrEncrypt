@@ -3,10 +3,10 @@ import java.util.ArrayList;
 public class CodeTest {
 	public static void main(String[] args) {
 
-		testAtest();
+		testAtest1();
 	}
 
-	public static void testAtest() {
+	public static void testAtest1() {
 
 		ArrayList<String> arrayList = new ArrayList<>();
 		int[] temp = new int[] {};
@@ -27,16 +27,90 @@ public class CodeTest {
 		// brbr给我弹视频语音的人直接拉黑不解释! brbr软件会持续更新,告诉大家的好消息是我的行动将掀起自带QQ抢红包狂潮哈
 		// brbr我呢是工资阶层,做这个东西呢只能晚上brbr双休去搞,时间不是很多,还有就是这破网上传速度太慢,自带的包文件大,所以更新比较慢,出现问题不会马上进行更新,不然我早上传很多个版本了brbr所以希望大家谅解,理解
 		// 你这么喷我软件这么这么垃圾我还有毛线的动力?brbr另外想加群的朋友可以点击http://qssq666.cn点击关于加入群哈!这里就不贴出来了..
-		temp = new int[] { 26469, 33258, 28909, 32842, 65329, 65329, 58, 34, 37, 115 };
-		temp=  new int[]{40, 26469, 33258, 65329, 65329, 58, 37, 115, 91, 37, 115, 93, 41};
-		arrayList.add(ByteEncodeUtil.printCharCode(temp));
+/*		temp = new int[] { 26469, 33258, 28909, 32842, 65329, 65329, 58, 34, 37, 115 };
+		temp=  new int[]{40, 26469, 33258, 65329, 65329, 58, 37, 115, 91, 37, 115, 93, 41};*/
+//	temp= new int[]{143496,143496,131076,105980,176,143496,143496,91292,81328,176,143496,143496,89212,143784,176,80160,80160,86856};//content=谢谢老板,谢谢大佬,谢谢土豪,么么哒
+
+temp= new int[]{357,405,405,389,197,397,473,521,537,473,529,533,197,489,529,197,509,513,533,197,529,537,465,465,473,529,529,245,197,397,473,529,517,513,509,529,473,197,465,513,469,473,197,489,529,197};//content=HTTP Request is not success, Response code is 
+
+//		arrayList.add(printCharCode(temp));
 		// arrayList.add(ByteEncodeUtil.printCharCode(QSSQ_zaicishenmingruanjianshiyongjiu_dou));
 		String tempStr = "";
+		tempStr="A";
+		arrayList.add(printCharCode(ByteEncodeUtil.charArrayToEncodeIntArray(tempStr.toCharArray())));
 		// tempStr="谢谢老板,谢谢大佬,谢谢土豪,么么哒";
 
 		// tempStr = "[群名:%s]\n[群号:%s]\n[昵称:%s]\n[ＱＱ:%s]";
 		// tempStr = "情迁红包 %s元(%s)\n";
-		arrayList.add(ByteEncodeUtil.printCharCode(ByteEncodeUtil.charArrayToEncodeIntArray(tempStr.toCharArray())));
+//		arrayList.add(printCharCode(ByteEncodeUtil.charArrayToEncodeIntArray(tempStr.toCharArray())));
+		// arrayList.add(printCharCode(charArrayToIntArray("\n[群锟斤拷:%s]\n[群锟斤拷:%s]\n[锟角筹拷:%s]\n[锟窖ｏ拷:%s]".toCharArray())));
+		// arrayList.add(printCharCode(charArrayToIntArray("锟斤拷锟斤拷锟捷硷拷锟斤拷失锟斤拷,锟斤拷锟斤拷没锟叫硷拷飧拷锟斤拷锟斤拷,锟斤拷锟斤拷锟截诧拷锟斤拷装锟斤拷迁锟斤拷锟斤拷锟结供锟侥硷拷锟斤拷锟结供锟竭凤拷锟斤拷锟斤拷锟�,锟缴斤拷锟狡碉拷锟斤拷锟斤拷锟斤拷薹锟斤拷锟斤拷艿锟斤拷锟斤拷锟絓nhttp://qssq666.cn\n群298081857".toCharArray())));
+	
+		 for (int i = 0; i < arrayList.size(); i++) { 
+	
+//		 System.out.println("line:" + arrayList.get(i)); 
+		 }
+	}
+
+	public static String printCharCode(int[] ints) {
+		char[] chars = new char[ints.length];
+		StringBuilder sbChars = new StringBuilder();
+		sbChars.append("   new int[]{");
+		for (int i = 0; i < ints.length; i++) {
+			StringBuffer tempsb=new StringBuffer();
+			tempsb.append(""+"srcCode:" + ints[i]  );
+			ints[i] = ByteEncodeUtil.getDecodeIntValue(ints[i]);
+			tempsb.append("解密后:"+ints[i]);
+			chars[i] = (char) ints[i];
+			System.out.println("【解密】"+tempsb.toString());
+			sbChars.append("" + ints[i]);
+			if (i != ints.length - 1) {
+				sbChars.append(",");
+			} else {
+				sbChars.append("};");
+			}
+		}
+
+		if (printSmallCode) {
+			StringBuilder sbSmallCode = new StringBuilder();
+			for (int i = 0; i < ints.length; i++) {
+				sbSmallCode.append("0x" + Integer.toHexString(ints[i]) + "\n");
+			}
+			System.out.println("smallCode\n:" + sbSmallCode.toString());
+		}
+
+		String chinese = new String(chars);
+		if (printChar) {
+			System.out.println("chars:" + sbChars.toString());
+
+		}
+		if (printChar || printSmallCode) {
+
+			System.out.println("result:" + chinese + "\n\n\n");
+		}
+		return chinese;
+	}
+
+	public static boolean printSmallCode = false;
+	public static boolean printChar = true;
+
+	public static void testAtest() {
+
+		ArrayList<String> arrayList = new ArrayList<>();
+		int[] temp = new int[] {};
+		// temp = new int[] { 10, 91, 32676, 21517, 58, 37, 115, 93, 10, 91,
+		// 32676, 21495, 58, 37, 115, 93, 10, 91, 26165, 31216, 58, 37, 115, 93,
+		// 10, 91, 65329, 65329, 58, 37, 115, 93 };
+
+		// temp = new int[] { 27809, 25250, 21040, 40, 37, 115, 41, 37, 115 };
+		// temp = new int[] {27809, 25250, 21040, 40, 37, 115, 41, 37, 115
+		// };//多一个10就是换行
+
+		arrayList.add(printCharCode(temp));
+		String tempStr = ":没抢到(%s)%s\n";
+		// tempStr = "[群名:%s]\n[群号:%s]\n[昵称:%s]\n[ＱＱ:%s]";
+		// tempStr = "情迁红包 %s元(%s)\n";
+		// arrayList.add(printCharCode(charArrayToEncodeIntArray(tempStr.toCharArray())));
 		// arrayList.add(printCharCode(charArrayToIntArray("\n[群锟斤拷:%s]\n[群锟斤拷:%s]\n[锟角筹拷:%s]\n[锟窖ｏ拷:%s]".toCharArray())));
 		// arrayList.add(printCharCode(charArrayToIntArray("锟斤拷锟斤拷锟捷硷拷锟斤拷失锟斤拷,锟斤拷锟斤拷没锟叫硷拷飧拷锟斤拷锟斤拷,锟斤拷锟斤拷锟截诧拷锟斤拷装锟斤拷迁锟斤拷锟斤拷锟结供锟侥硷拷锟斤拷锟结供锟竭凤拷锟斤拷锟斤拷锟�,锟缴斤拷锟狡碉拷锟斤拷锟斤拷锟斤拷薹锟斤拷锟斤拷艿锟斤拷锟斤拷锟絓nhttp://qssq666.cn\n群298081857".toCharArray())));
 		/*
@@ -45,4 +119,15 @@ public class CodeTest {
 		 * ","); }
 		 */
 	}
+
+	public static int[] charArrayToEncodeIntArray(char[] chars) {
+		int[] intArray = new int[chars.length];
+		for (int i = 0; i < chars.length; i++) {
+			intArray[i] = chars[i];
+			intArray[i] = ByteEncodeUtil.getEncodeIntValue(intArray[i]);
+
+		}
+		return intArray;
+	}
+
 }

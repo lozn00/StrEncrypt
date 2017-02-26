@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,8 +39,16 @@ public class ByteEncodeUtil {
 	 */
 	static HashMap<String, String> vardNameMap = new HashMap<>();
 
-	static boolean isIgNoreDecodeText(String text) {
-		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG");
+	static boolean isIgNoreDecodeText(String text) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
+		return isIgNoreDecodeText(text, false);
+	}
+
+	static boolean isIgNoreDecodeText(String text, boolean isdecodeConstants) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
+		if (isdecodeConstants) {
+
+			return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG");
+		}
+		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || (text.contains("final") && text.contains("static"));
 	}
 
 	private static final String sIGNORE_DECODE = "IGNORE_DECODE";
@@ -115,16 +124,25 @@ public class ByteEncodeUtil {
 		// deAndroid();
 		// String file = "F:\\QQ_weichat\\test\\Test.java";
 		// String file = "C:\\Users\\Administrator\\Desktop\\Test.java";
+		String lineText = "开始\n结束 如果还是换行了说明替换失败";
+		lineText = lineText.replaceAll("\n", sBrSign);
+		System.err.println("解析后替换变量结果" + lineText);
 
 		debug = true;
-		encodeJavaAndroid();
 		// encodeJavaAndroid();
+		// decodeJavaAndroid();
+		encodeJavaAndroid();
 	}
 
 	private static void decodeJavaAndroid() {
 
-		String file;
+		looadDecodeFieldToHashMap(sConstantClassPath, false);// 删除不存在的注释一下//开启有风险如果一个文件崩溃了到时候变量找不到了
 
+		ArrayList<String> arrayList = getFileArrayList();
+		for (int i = 0; i < arrayList.size(); i++) {
+			String file = arrayList.get(i);
+			doDecodeAllJava(file);
+		}
 		// file =
 		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\InitConfig.java";
 		// file =
@@ -133,7 +151,8 @@ public class ByteEncodeUtil {
 		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
 		// file =
 		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
-		file = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
+		// file =
+		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
 		// file =
 		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
 		// file =
@@ -155,25 +174,27 @@ public class ByteEncodeUtil {
 		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QQUnrecalledHook.java";
 		 */
 
-		doDecodeAllJava(file);
 	}
 
 	private static void encodeJavaAndroid() {
-		String file = "";
-		// file="F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
-		file = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
-		doEncodeAllJava(file);
-		/*
-		 * file =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
-		 * doEncodeAllJava(file); file =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
-		 * doEncodeAllJava(file); file =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
-		 * doEncodeAllJava(file); file =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QQUnrecalledHook.java";
-		 * doEncodeAllJava(file);
-		 */
+
+		ArrayList<String> list = getFileArrayList();
+		readEncodeVarArrayList(list);
+		for (int i = 0; i < list.size(); i++) {
+
+			String file = list.get(i);
+			doEncodeAllJava(file);
+		}
+	}
+
+	private static String getExtendsNameByFile(File file) {
+		String expandsName = FilenameUtils.getExtension(file.getAbsolutePath());
+		return expandsName;
+	}
+
+	private static String getClassNameByFile(File file) {
+		String className = FilenameUtils.getBaseName(file.getAbsolutePath());
+		return className;
 	}
 
 	protected static void doEncodeAllJava(String path) {
@@ -190,36 +211,15 @@ public class ByteEncodeUtil {
 				}
 			}
 		}
-		String expandsName = FilenameUtils.getExtension(file.getAbsolutePath());
-		String className = FilenameUtils.getBaseName(file.getAbsolutePath());
+		String expandsName = getExtendsNameByFile(file);
+		String className = getClassNameByFile(file);
 		if (!"java".equals(expandsName)) {
 			System.out.println("extensionName:" + expandsName + ",className:" + className);// extensionName:txt,className:fw
 			System.out.println("忽略文件 非java文件:" + file.getAbsolutePath());
 
 			return;
 		}
-		String constantClassSrc;
-		try {
-			constantClassSrc = FileUtils.readFileToString(new File(sConstantClassPath), "utf-8");
-		} catch (IOException e1) {
 
-			e1.printStackTrace();
-			return;
-		}
-		;
-		String temp = readEncodeVarAndInsert(path, className, constantClassSrc);// className用于判断到底属于那个类的变量
-		/*
-		 * try { FileUtils.copyFile(new File(sConstantClassPath), new
-		 * File(sConstantClassPath + ".bak")); } catch (IOException e1) {
-		 * 
-		 * e1.printStackTrace(); }
-		 */
-		try {
-			FileUtils.writeStringToFile(new File(sConstantClassPath), temp, "utf-8", false);
-		} catch (IOException e1) {
-
-			e1.printStackTrace();
-		}
 		String result = readTxtFileEncode(path, className);
 		if (!writeFile) {
 			System.out.println("忽略,不写入文件");
@@ -228,10 +228,41 @@ public class ByteEncodeUtil {
 		try {
 			FileUtils.writeStringToFile(file, result, "utf-8", false);
 		} catch (IOException e) {
-			System.out.println("写入一个文件失败:" + file.getAbsolutePath() + "\n" + e.toString() + "\n");
+			System.err.println("写入一个文件失败:" + file.getAbsolutePath() + "\n" + e.toString() + "\n");
 			e.printStackTrace();
 		}
 		System.out.print("覆盖文件成功:" + path + "\n");
+	}
+
+	/**
+	 * 获取要加密或者解密的文件集合
+	 * 
+	 * @return
+	 */
+	private static ArrayList<String> getFileArrayList() {
+		String temp = "";
+		ArrayList<String> list = new ArrayList<String>();
+		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
+		list.add(temp);
+		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
+		list.add(temp);
+		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QQUnrecalledHook.java";
+		list.add(temp);
+		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
+		list.add(temp);
+		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
+		list.add(temp);
+		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
+		/*
+		 * list.add(temp); temp =
+		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\TestVar.java";
+		 */
+		list.add(temp);
+		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\qqplugin.java";
+		list.add(temp);
+		temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\InitConfig.java";
+		list.add(temp);
+		return list;
 	}
 
 	/**
@@ -392,6 +423,37 @@ public class ByteEncodeUtil {
 		return "////【插入分割线[" + className + "]:" + getCurrentTime() + "】\n";
 	}
 
+	public static void readEncodeVarArrayList(ArrayList<String> list) {
+
+		String constantClassSrc;// 这个值不断的变化叠加。不会反悔null.
+		try {
+			constantClassSrc = FileUtils.readFileToString(new File(sConstantClassPath), "utf-8");
+		} catch (IOException e1) {
+
+			e1.printStackTrace();
+			throw new RuntimeException(e1);
+		}
+
+		for (int i = 0; i < list.size(); i++) {
+			String file = list.get(i);
+			String className = getClassNameByFile(new File(file));
+			constantClassSrc = readEncodeVarAndInsert(file, className, constantClassSrc);// className用于判断到底属于那个类的变量
+		}
+		;
+		/*
+		 * try { FileUtils.copyFile(new File(sConstantClassPath), new
+		 * File(sConstantClassPath + ".bak")); } catch (IOException e1) {
+		 * 
+		 * e1.printStackTrace(); }
+		 */
+		try {
+			FileUtils.writeStringToFile(new File(sConstantClassPath), constantClassSrc, "utf-8", false);
+		} catch (IOException e1) {
+
+			e1.printStackTrace();
+		}
+	}
+
 	public static String readEncodeVarAndInsert(String filePath, String className, String vardeclareJava) {
 
 		/**
@@ -463,10 +525,12 @@ public class ByteEncodeUtil {
 				read.close();
 			} else {
 				System.out.println("找不到指定的文件");
+				throw new RuntimeException("找不到指定的文件");
 			}
 		} catch (Exception e) {
 			System.out.println("读取文件内容出错");
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		varNameSb.append(getInsertSplitLine(className));
 		return insertFieldAtClassAfter(className, vardeclareJava, varNameSb.toString());
@@ -526,7 +590,11 @@ public class ByteEncodeUtil {
 					// 匹配类似velocity规则的字符串
 
 					// 生成匹配模式的正则表达式
-					if (lineTxt.contains("int") && !isIgNoreDecodeText(lineTxt)) {
+					if (lineTxt.contains("int")) {// 对于常量行不需要判断是否是静态常量的。
+						if (isIgNoreDecodeText(lineTxt, true)) {
+							System.err.println("解析忽略忽略行：" + lineTxt);
+							continue;
+						}
 						Pattern patternVarName = Pattern.compile(encodeLineReg);
 						Matcher matcher = patternVarName.matcher(lineTxt);
 
@@ -539,7 +607,7 @@ public class ByteEncodeUtil {
 							for (int i = 0; i < chars.length; i++) {
 								arr[i] = arr[i].replace(" ", "");
 								int tempInt = Integer.parseInt(arr[i]);
-								tempInt = tempInt >> 2;// 除2
+								tempInt = getDecodeIntValue(tempInt);
 								chars[i] = (char) tempInt;
 							}
 							String decodeResult = String.valueOf(chars);
@@ -556,11 +624,12 @@ public class ByteEncodeUtil {
 				}
 				read.close();
 			} else {
-				System.out.println("找不到指定的文件");
+				throw new Error("找不到常量文件" + file);
 			}
 		} catch (Exception e) {
 			System.out.println("读取文件内容出错");
 			e.printStackTrace();
+			throw new Error(e);
 		}
 		/*
 		 * if (true) { throw new RuntimeException("等待处理");
@@ -605,7 +674,7 @@ public class ByteEncodeUtil {
 	 * @return
 	 */
 	public static String readTxtFileDecode(String filePath, String className) {
-		looadDecodeFieldToHashMap(sConstantClassPath, false);
+
 		/**
 		 * 加密变量名 和 解密结果
 		 */
@@ -627,14 +696,13 @@ public class ByteEncodeUtil {
 						// System.err.println("当前可能是变量行行:"+lineTxt);
 						Matcher matcherMethod = patternVarMethod.matcher(lineTxt);
 						while (matcherMethod.find()) {
-							Matcher matcher;
 							String matchBase = matcherMethod.group();// 获取匹配航
 							String temp = matcherMethod.group(1);// 把变量名替换即可
 							String varName = temp.replace(sConstantsClass + ".", "");// 触发类名.
 							if (vardNameMap.containsKey(varName)) {
 								String value = vardNameMap.get(varName);
 								lineTxt = lineTxt.replace(decodeMethodName + "(" + temp + ")", "\"" + value + "\"");
-								lineTxt.replaceAll("\n", sBrSign);
+								lineTxt = lineTxt.replaceAll("\n", sBrSign);
 								System.out.println("找到定义变量名：" + temp + "实际变量值:" + value + "\n替换后当前行:" + lineTxt);
 
 							} else {
@@ -649,11 +717,14 @@ public class ByteEncodeUtil {
 				}
 				read.close();
 			} else {
-				System.out.println("找不到指定的文件");
+
+				System.err.println("找不到指定的文件");
+				throw new RuntimeException("找不到文件" + filePath);
 			}
 		} catch (Exception e) {
 			System.out.println("读取文件内容出错");
 			e.printStackTrace();
+			throw new RuntimeException("文件文件" + e);
 		}
 		/*
 		 * if (true) { throw new RuntimeException("等待处理");
@@ -686,11 +757,10 @@ public class ByteEncodeUtil {
 					// 匹配类似velocity规则的字符串
 
 					// 生成匹配模式的正则表达式
-			
 
 					// 两个方法：appendReplacement, appendTail
 					if (isIgNoreDecodeText(lineTxt)) {// 一般情况下这是一个私有的字段
-																																														// 忽略
+														// 忽略
 						if (debug) {
 							// 那么问题来了，\n字符串如何处理换行问题呢、
 							System.out.println("readTxtFileEncode->忽略包含日志行 忽略:" + lineTxt);
@@ -829,40 +899,23 @@ public class ByteEncodeUtil {
 
 	}
 
-	public static void testAtest() {
-
-		ArrayList<String> arrayList = new ArrayList<>();
-		int[] temp = new int[] {};
-		// temp = new int[] { 10, 91, 32676, 21517, 58, 37, 115, 93, 10, 91,
-		// 32676, 21495, 58, 37, 115, 93, 10, 91, 26165, 31216, 58, 37, 115, 93,
-		// 10, 91, 65329, 65329, 58, 37, 115, 93 };
-
-		// temp = new int[] { 27809, 25250, 21040, 40, 37, 115, 41, 37, 115 };
-		// temp = new int[] {27809, 25250, 21040, 40, 37, 115, 41, 37, 115
-		// };//多一个10就是换行
-
-		arrayList.add(printCharCode(temp));
-		String tempStr = ":没抢到(%s)%s\n";
-		// tempStr = "[群名:%s]\n[群号:%s]\n[昵称:%s]\n[ＱＱ:%s]";
-		// tempStr = "情迁红包 %s元(%s)\n";
-		arrayList.add(printCharCode(charArrayToEncodeIntArray(tempStr.toCharArray())));
-		// arrayList.add(printCharCode(charArrayToIntArray("\n[群锟斤拷:%s]\n[群锟斤拷:%s]\n[锟角筹拷:%s]\n[锟窖ｏ拷:%s]".toCharArray())));
-		// arrayList.add(printCharCode(charArrayToIntArray("锟斤拷锟斤拷锟捷硷拷锟斤拷失锟斤拷,锟斤拷锟斤拷没锟叫硷拷飧拷锟斤拷锟斤拷,锟斤拷锟斤拷锟截诧拷锟斤拷装锟斤拷迁锟斤拷锟斤拷锟结供锟侥硷拷锟斤拷锟结供锟竭凤拷锟斤拷锟斤拷锟�,锟缴斤拷锟狡碉拷锟斤拷锟斤拷锟斤拷薹锟斤拷锟斤拷艿锟斤拷锟斤拷锟絓nhttp://qssq666.cn\n群298081857".toCharArray())));
-		/*
-		 * for (int i = 0; i < arrayList.size(); i++) { String s =
-		 * arrayList.get(i); System.out.println("line:" + (1 + i) + "," + s +
-		 * ","); }
-		 */
-	}
-
 	public static int[] charArrayToEncodeIntArray(char[] chars) {
 		int[] intArray = new int[chars.length];
 		for (int i = 0; i < chars.length; i++) {
 			intArray[i] = chars[i];
-			intArray[i] = intArray[i] << 2;// 加密<<2乘2
+			intArray[i] = getEncodeIntValue(intArray[i]);
+			System.out.println("加密前:"+((int)chars[i])+",加密后:"+intArray[i]);
 
 		}
 		return intArray;
+	}
+
+	public static int getEncodeIntValue(int value) {
+		return (value << 2) + 69;// 线 与运算再叠加
+	}
+
+	public static int getDecodeIntValue(int value) {
+		return (value - 69) >> 2;// 移除代价再与运算
 	}
 
 	// private int[] a=new int[];
@@ -899,40 +952,6 @@ public class ByteEncodeUtil {
 		}
 
 		return sbChars.toString();
-	}
-
-	public static String printCharCode(int[] ints) {
-		char[] chars = new char[ints.length];
-		StringBuilder sbChars = new StringBuilder();
-		sbChars.append("   new int[]{");
-		for (int i = 0; i < ints.length; i++) {
-			chars[i] = (char) ints[i];
-			sbChars.append("" + ints[i]);
-			if (i != ints.length - 1) {
-				sbChars.append(",");
-			} else {
-				sbChars.append("};");
-			}
-		}
-
-		if (printSmallCode) {
-			StringBuilder sbSmallCode = new StringBuilder();
-			for (int i = 0; i < ints.length; i++) {
-				sbSmallCode.append("0x" + Integer.toHexString(ints[i]) + "\n");
-			}
-			System.out.println("smallCode\n:" + sbSmallCode.toString());
-		}
-
-		String chinese = new String(chars);
-		if (printChar) {
-			System.out.println("chars:" + sbChars.toString());
-
-		}
-		if (printChar || printSmallCode) {
-
-			System.out.println("result:" + chinese + "\n\n\n");
-		}
-		return chinese;
 	}
 
 }
