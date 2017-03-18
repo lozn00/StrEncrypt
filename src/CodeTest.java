@@ -1,3 +1,4 @@
+import java.awt.image.ReplicateScaleFilter;
 import java.util.ArrayList;
 
 public class CodeTest {
@@ -27,30 +28,36 @@ public class CodeTest {
 		// brbr给我弹视频语音的人直接拉黑不解释! brbr软件会持续更新,告诉大家的好消息是我的行动将掀起自带QQ抢红包狂潮哈
 		// brbr我呢是工资阶层,做这个东西呢只能晚上brbr双休去搞,时间不是很多,还有就是这破网上传速度太慢,自带的包文件大,所以更新比较慢,出现问题不会马上进行更新,不然我早上传很多个版本了brbr所以希望大家谅解,理解
 		// 你这么喷我软件这么这么垃圾我还有毛线的动力?brbr另外想加群的朋友可以点击http://qssq666.cn点击关于加入群哈!这里就不贴出来了..
-/*		temp = new int[] { 26469, 33258, 28909, 32842, 65329, 65329, 58, 34, 37, 115 };
-		temp=  new int[]{40, 26469, 33258, 65329, 65329, 58, 37, 115, 91, 37, 115, 93, 41};*/
-//	temp= new int[]{143496,143496,131076,105980,176,143496,143496,91292,81328,176,143496,143496,89212,143784,176,80160,80160,86856};//content=谢谢老板,谢谢大佬,谢谢土豪,么么哒
+		/*
+		 * temp = new int[] { 26469, 33258, 28909, 32842, 65329, 65329, 58, 34,
+		 * 37, 115 }; temp= new int[]{40, 26469, 33258, 65329, 65329, 58, 37,
+		 * 115, 91, 37, 115, 93, 41};
+		 */
+		// temp= new
+		// int[]{143496,143496,131076,105980,176,143496,143496,91292,81328,176,143496,143496,89212,143784,176,80160,80160,86856};//content=谢谢老板,谢谢大佬,谢谢土豪,么么哒
 
-temp =new int[]{465,513,505,253,533,473,509,465,473,509,533,253,505,513,461,489,501,473,521,521,253,545,489,469,481,473,533,253,349,513,525,505,401,489,505,517,501,473,361,533,473,505};//content=com.tencent.mobileqq.widget.FormSimpleItem
+		temp = new int[] { 465, 513, 505, 253, 533, 473, 509, 465, 473, 509, 533, 253, 505, 513, 461, 489, 501, 473, 521, 521, 253, 545, 489, 469, 481, 473, 533, 253, 349, 513, 525, 505, 401, 489, 505, 517, 501, 473, 361, 533, 473, 505 };// content=com.tencent.mobileqq.widget.FormSimpleItem
+		temp = new int[] { 437, 437, 213, 505, 513, 509, 473, 553 };// content=\\$money
 
-//temp= new int[]{529,473,533,373,473,477,533,405,473,549,533};
-	arrayList.add(printCharCode(temp));
+		// temp= new int[]{529,473,533,373,473,477,533,405,473,549,533};
+		arrayList.add(printCharCode(temp));
 		// arrayList.add(ByteEncodeUtil.printCharCode(QSSQ_zaicishenmingruanjianshiyongjiu_dou));
 		String tempStr = "";
-		tempStr="A";
+		tempStr = "A";
 		arrayList.add(printCharCode(ByteEncodeUtil.charArrayToEncodeIntArray(tempStr.toCharArray())));
+		arrayList.add(printCharCode(ByteEncodeUtil.charArrayToEncodeIntArray("\\$name".toCharArray())));
 		// tempStr="谢谢老板,谢谢大佬,谢谢土豪,么么哒";
 
 		// tempStr = "[群名:%s]\n[群号:%s]\n[昵称:%s]\n[ＱＱ:%s]";
 		// tempStr = "情迁红包 %s元(%s)\n";
-//		arrayList.add(printCharCode(ByteEncodeUtil.charArrayToEncodeIntArray(tempStr.toCharArray())));
+		// arrayList.add(printCharCode(ByteEncodeUtil.charArrayToEncodeIntArray(tempStr.toCharArray())));
 		// arrayList.add(printCharCode(charArrayToIntArray("\n[群锟斤拷:%s]\n[群锟斤拷:%s]\n[锟角筹拷:%s]\n[锟窖ｏ拷:%s]".toCharArray())));
 		// arrayList.add(printCharCode(charArrayToIntArray("锟斤拷锟斤拷锟捷硷拷锟斤拷失锟斤拷,锟斤拷锟斤拷没锟叫硷拷飧拷锟斤拷锟斤拷,锟斤拷锟斤拷锟截诧拷锟斤拷装锟斤拷迁锟斤拷锟斤拷锟结供锟侥硷拷锟斤拷锟结供锟竭凤拷锟斤拷锟斤拷锟�,锟缴斤拷锟狡碉拷锟斤拷锟斤拷锟斤拷薹锟斤拷锟斤拷艿锟斤拷锟斤拷锟絓nhttp://qssq666.cn\n群298081857".toCharArray())));
-	
-		 for (int i = 0; i < arrayList.size(); i++) { 
-	
-//		 System.out.println("line:" + arrayList.get(i)); 
-		 }
+
+		for (int i = 0; i < arrayList.size(); i++) {
+
+			// System.out.println("line:" + arrayList.get(i));
+		}
 	}
 
 	public static String printCharCode(int[] ints) {
@@ -58,12 +65,12 @@ temp =new int[]{465,513,505,253,533,473,509,465,473,509,533,253,505,513,461,489,
 		StringBuilder sbChars = new StringBuilder();
 		sbChars.append("   new int[]{");
 		for (int i = 0; i < ints.length; i++) {
-			StringBuffer tempsb=new StringBuffer();
-			tempsb.append(""+"srcCode:" + ints[i]  );
+			StringBuffer tempsb = new StringBuffer();
+			tempsb.append("" + "srcCode:" + ints[i]);
 			ints[i] = ByteEncodeUtil.getDecodeIntValue(ints[i]);
-			tempsb.append("解密后:"+ints[i]);
+			tempsb.append("解密后:" + ints[i]);
 			chars[i] = (char) ints[i];
-			System.out.println("【解密】"+tempsb.toString());
+			System.out.println("【解密】" + tempsb.toString());
 			sbChars.append("" + ints[i]);
 			if (i != ints.length - 1) {
 				sbChars.append(",");
@@ -87,7 +94,13 @@ temp =new int[]{465,513,505,253,533,473,509,465,473,509,533,253,505,513,461,489,
 		}
 		if (printChar || printSmallCode) {
 
-			System.out.println("result:" + chinese + "\n\n\n");
+			System.out.println("result:[" + chinese + "]\n\n\n");
+			String temp = "$moneyfff$name";
+			String money = "1.0";
+			String send_name = "sedfdf";
+			temp = temp.replaceAll(chinese,money);
+			temp = temp.replaceAll(chinese,send_name);
+			System.out.println("replaceAllresut:" + temp);
 		}
 		return chinese;
 	}

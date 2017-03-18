@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -5,27 +6,22 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.omg.CORBA.VersionSpecHelper;
-import org.omg.PortableInterceptor.INACTIVE;
-
-import net.sourceforge.pinyin4j.PinyinHelper;
 
 public class ByteEncodeUtil {
 
 	static HashMap<String, String> sEncodeMap = new HashMap<>();
 	public static String sConstantsClass = "ConstantValue";
-	public static final String sConstantClassPath = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
+	public static String sConstantClassPath = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
 
 	static HanyuPinyinHelper hanyuPinyinHelper = new HanyuPinyinHelper();
 	/**
@@ -67,10 +63,11 @@ public class ByteEncodeUtil {
 		String lineText = "开始\n结束 如果还是换行了说明替换失败";
 		lineText = lineText.replaceAll("\n", sBrSign);
 		System.out.println("解析后替换变量结果" + lineText);
-		// decodeJavaAndroid();
-		// encodeJavaAndroid();
 		debug = true;
-		encodeJavaAndroid();
+		decodeJavaAndroid();
+		// encodeJavaAndroid();
+		
+//	 encodeJavaAndroid();
 		/*
 		 * 
 		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
@@ -114,10 +111,16 @@ public class ByteEncodeUtil {
 	}
 
 	private static void decodeJavaAndroid() {
-
-		looadDecodeFieldToHashMap(sConstantClassPath, false);// 删除不存在的注释一下//开启有风险如果一个文件崩溃了到时候变量找不到了
-
 		ArrayList<String> arrayList = getFileArrayList();
+		if (debug) {
+			System.out.println("准被加载常量文件" + sConstantClassPath + ",类" + sConstantsClass);
+		}
+		looadDecodeFieldToHashMap(sConstantClassPath, false);// 删除不存在的注释一下//开启有风险如果一个文件崩溃了到时候变量找不到了
+		if (debug) {
+			System.out.println("加载常数组量完毕!,总数:" + sDecodeMap.size()+",即将进行解密");
+
+		}
+	
 		for (int i = 0; i < arrayList.size(); i++) {
 			String file = arrayList.get(i);
 			doDecodeAllJava(file);
@@ -231,12 +234,33 @@ public class ByteEncodeUtil {
 	private static ArrayList<String> getFileArrayList() {
 		String temp = "";
 		ArrayList<String> list = new ArrayList<String>();
+		if (8 == 8) {
+			sConstantsClass = "Constants";
+			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\Constants.java";
+			enableNewEncrypt = true;
+//			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
+			// list.add(temp);
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\SetingFragment.java";
+			list.add(temp);
+		} else if (1 == 9) {
+			sConstantClassPath = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
+			temp = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\cn\\qssq666\\robot\\business\\RobotContentProvider.java";
 
-		if (false == true) {
+			list.add(temp);
+			temp = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\cn\\qssq666\\robot\\AddWordActivity.java";
+			list.add(temp);
+			/*
+			 * temp =
+			 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
+			 * list.add(temp);
+			 */
+		} else if (false == true) {
 			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\TestVar.java";
 			list.add(temp);
 		} else {
 
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\util\\robot\\RobotUtil.java";
+			list.add(temp);
 			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
 			list.add(temp);
 			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
@@ -608,15 +632,10 @@ public class ByteEncodeUtil {
 							String temp = matcher.group(1);// 获取匹配yuanzn
 							String arrsStr = matcher.group(2);// 获取匹配yuanzn
 							String[] arr = arr = arrsStr.split(",");
-							char[] chars = new char[arr.length];
-							for (int i = 0; i < chars.length; i++) {
-								arr[i] = arr[i].replace(" ", "");
-								int tempInt = Integer.parseInt(arr[i]);
-								tempInt = getDecodeIntValue(tempInt);
-								chars[i] = (char) tempInt;
+							String decodeResult = getDeCodeValue(arr);
+							if(debug){
+								System.out.println("varName:" + temp + ",解密结果:" + decodeResult);
 							}
-							String decodeResult = String.valueOf(chars);
-							System.out.println("varName:" + temp + ",解密结果:" + decodeResult);
 							sDecodeMap.put(temp, decodeResult);
 							if (needReplace) {
 								lineTxt = "////" + sIGNORE_DECODE + lineTxt;// 不进行删除而是进行注释
@@ -910,22 +929,71 @@ public class ByteEncodeUtil {
 	}
 
 	public static int[] charArrayToEncodeIntArray(char[] chars) {
-		int[] intArray = new int[chars.length];
-		for (int i = 0; i < chars.length; i++) {
-			intArray[i] = chars[i];
-			intArray[i] = getEncodeIntValue(intArray[i]);
-			System.out.println("加密前:" + ((int) chars[i]) + ",加密后:" + intArray[i]);
+
+		if (enableNewEncrypt) {
+			int[] intArray = new int[chars.length + 1];
+			int randomEncryptValue = Math.abs(new Random().nextInt(6948));
+			intArray[0] = randomEncryptValue;
+			for (int i = 1; i < intArray.length; i++) {
+				int curentChars = chars[i - 1];// 加密的字符串但是还是要从0开始的，所以还是感觉放在后面更容易一些。但是
+												// 解密还不是要麻烦一些。
+				intArray[i] = getEncodeIntValue(curentChars, randomEncryptValue);
+				System.out.println("加密前:" + ((int) curentChars) + ",加密后:" + intArray[i]);
+
+			}
+			return intArray;
+
+		} else {
+			int[] intArray = new int[chars.length];
+			for (int i = 0; i < chars.length; i++) {
+				intArray[i] = chars[i];
+				intArray[i] = getEncodeIntValue(intArray[i], 69);
+				System.out.println("加密前:" + ((int) chars[i]) + ",加密后:" + intArray[i]);
+
+			}
+			return intArray;
 
 		}
-		return intArray;
+
 	}
 
-	public static int getEncodeIntValue(int value) {
-		return (value << 2) + 69;// 线 与运算再叠加
+	private static String getDeCodeValue(String[] arr) {
+		if (enableNewEncrypt) {
+			char[] chars = new char[arr.length - 1];
+			String temp = arr[0].replace(" ", "");
+			int decyprtValue = Integer.valueOf(temp);
+			for (int i = 1; i < arr.length; i++) {
+				arr[i] = arr[i].replace(" ", "");
+				int tempInt = Integer.parseInt(arr[i]);
+				tempInt = getDecodeIntValue(tempInt, decyprtValue);
+				chars[i - 1] = (char) tempInt;
+			}
+			String decodeResult = String.valueOf(chars);
+			return decodeResult;
+		} else {
+			char[] chars = new char[arr.length];
+			for (int i = 0; i < chars.length; i++) {
+				arr[i] = arr[i].replace(" ", "");
+				int tempInt = Integer.parseInt(arr[i]);
+				tempInt = getDecodeIntValue(tempInt, 69);
+				chars[i] = (char) tempInt;
+			}
+			String decodeResult = String.valueOf(chars);
+			return decodeResult;
+		}
 	}
 
-	public static int getDecodeIntValue(int value) {
-		return (value - 69) >> 2;// 移除代价再与运算
+	public static boolean enableNewEncrypt = false;
+
+	public static int getEncodeIntValue(int value, int encryptValue) {
+		if (enableNewEncrypt) {
+
+		}
+		return (value << 2) + encryptValue;// 线 与运算再叠加
+	}
+
+	public static int getDecodeIntValue(int value, int decryptValue) {
+		return (value - decryptValue) >> 2;// 移除代价再与运算
 	}
 
 	// private int[] a=new int[];
