@@ -43,8 +43,9 @@ public class ByteEncodeUtil {
 	 * \s*int\[\s*\]\s*(\w*)\s*\=\s*new\s*int\[\s*\]\s*\{(.*?)\}
 	 * ="\\s*int\\[\\s*\\]\\s*(\\w*)\\s*\\=\\s*new\\s*int\\[\\s*\\]\\s*\\{(.*?)\\}";
 	 */
-
-	public static final String encodeLineReg = ".*?\\s*int\\[\\s*\\]\\s*(\\w*)\\s*\\=\\s*new\\s*int\\[\\s*\\]\\s*\\{(.*?)\\}.*?";
+	//java里面必须前面后面加上.*?
+	public static final String encodeLineReg = ".*?\\s*int\\[\\s*\\]\\s*(.+)\\s*\\=\\s*new\\s*int\\[\\s*\\]\\s*\\{(.*?)\\}.*?";
+//	public static final String encodeLineReg = ".*?\\s*int\\[\\s*\\]\\s*(\\w*)\\s*\\=\\s*new\\s*int\\[\\s*\\]\\s*\\{(.*?)\\}.*?";
 	// public static final String encodeLineReg
 	// =".*?int\\[\\s*\\](\\s*).*?\\=.*?\\{(.*?)\\}.*?";
 	public static boolean printSmallCode = false;
@@ -1096,6 +1097,9 @@ public class ByteEncodeUtil {
 		temp = temp.replaceAll("	", "");
 		if (temp.contains("ignore_exclude")) {
 			return false;// 表示必须加密的，
+		}
+		if (temp.contains("ignore_include")) {
+			return true;// 表示无需加密
 		}
 		if (temp.contains("ignore_start") || temp.contains("regoin_start")) {
 			enteIgnoreBlock = true;
