@@ -64,10 +64,10 @@ public class ByteEncodeUtil {
 		lineText = lineText.replaceAll("\n", sBrSign);
 		System.out.println("解析后替换变量结果" + lineText);
 		debug = true;
-		decodeJavaAndroid();
+		// decodeJavaAndroid();
+		encodeJavaAndroid();
+
 		// encodeJavaAndroid();
-		
-//	 encodeJavaAndroid();
 		/*
 		 * 
 		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
@@ -117,10 +117,10 @@ public class ByteEncodeUtil {
 		}
 		looadDecodeFieldToHashMap(sConstantClassPath, false);// 删除不存在的注释一下//开启有风险如果一个文件崩溃了到时候变量找不到了
 		if (debug) {
-			System.out.println("加载常数组量完毕!,总数:" + sDecodeMap.size()+",即将进行解密");
+			System.out.println("加载常数组量完毕!,总数:" + sDecodeMap.size() + ",即将进行解密");
 
 		}
-	
+
 		for (int i = 0; i < arrayList.size(); i++) {
 			String file = arrayList.get(i);
 			doDecodeAllJava(file);
@@ -238,9 +238,11 @@ public class ByteEncodeUtil {
 			sConstantsClass = "Constants";
 			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\Constants.java";
 			enableNewEncrypt = true;
-//			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
-			// list.add(temp);
+			/*temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
+			list.add(temp);
 			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\SetingFragment.java";
+			list.add(temp);*/
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\WeChatVersionInit.java";
 			list.add(temp);
 		} else if (1 == 9) {
 			sConstantClassPath = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
@@ -256,6 +258,9 @@ public class ByteEncodeUtil {
 			 */
 		} else if (false == true) {
 			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\TestVar.java";
+			list.add(temp);
+		} else if (11 == 111) {
+			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
 			list.add(temp);
 		} else {
 
@@ -633,7 +638,7 @@ public class ByteEncodeUtil {
 							String arrsStr = matcher.group(2);// 获取匹配yuanzn
 							String[] arr = arr = arrsStr.split(",");
 							String decodeResult = getDeCodeValue(arr);
-							if(debug){
+							if (debug) {
 								System.out.println("varName:" + temp + ",解密结果:" + decodeResult);
 							}
 							sDecodeMap.put(temp, decodeResult);
@@ -1043,10 +1048,50 @@ public class ByteEncodeUtil {
 	}
 
 	static boolean isIgNoreDecodeText(String text, boolean isdecodeConstants) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
+		String temp=text.replaceAll(" ", "");
+			if(temp.startsWith("//")){
+				if(debug){
+					System.out.println("忽略行注释//"+text);
+				}
+				return true;//注释行忽略，
+			}
+			if(temp.startsWith("/*") && temp.indexOf("*/")!=-1){
+				if(debug){
+					System.out.println("忽略行块注释 "+text);
+				}
+				return true;
+			}
+			if(temp.startsWith("/*")){
+				if(debug){
+					System.out.println("忽略行注释,start/"+text);
+				}
+				enteBlockComment=true;
+				return true;
+			}else if(temp.indexOf("*/")!=-1){
+				enteBlockComment=false;
+				if(debug){
+					System.out.println("忽略行注释,end "+text);
+				}
+				return true;
+			}
+			if(enteBlockComment){
+				if(debug){
+					System.out.println("属于航快区域, "+text);
+				}
+				return true;
+			}
+		
+		
+		
+		
+		
 		if (isdecodeConstants) {
 
-			return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG");
+			return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || text.toUpperCase().contains("QSSQUtils.Log".toUpperCase());
 		}
-		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || (text.contains("final") && text.contains("static"));
+// QSSQUtils.Log(
+		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG")  || text.toUpperCase().contains("QSSQUtils.Log".toUpperCase())|| (text.contains("final") && text.contains("static"));
 	}
+	public static boolean enteBlockComment=false;
+	
 }
