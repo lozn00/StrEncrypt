@@ -202,7 +202,12 @@ public class ByteEncodeUtil {
 			return;
 		}
 
-		String result = readTxtFileEncode(path, className);
+		OperaInfo resultInfo = readTxtFileEncode(path, className);
+		if (!resultInfo.isResult()) {
+			System.err.println("忽略文件" + file.getAbsolutePath() + "因为此文件已经全部加密完毕," + resultInfo.getMessage());
+			return;
+		}
+		String result = resultInfo.getDoWhileResultText();
 		if (!writeFile) {
 			System.out.println("忽略,不写入文件");
 			return;
@@ -234,21 +239,31 @@ public class ByteEncodeUtil {
 	private static ArrayList<String> getFileArrayList() {
 		String temp = "";
 		ArrayList<String> list = new ArrayList<String>();
-		if (8 == 8) {
+		if (8 == 8) {// 加密情插件
 			sConstantsClass = "Constants";
 			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\Constants.java";
 			enableNewEncrypt = true;
-			/*temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
-			list.add(temp);
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\SetingFragment.java";
-			list.add(temp);*/
+			/*
+			 * temp =
+			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
+			 * list.add(temp); temp =
+			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\SetingFragment.java";
+			 * list.add(temp);
+			 */
 			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\WeChatVersionInit.java";
+			list.add(temp);
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\QQVersionInit.java";
+			list.add(temp);
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookTIMQQ.java";
+			list.add(temp);
+			temp =   "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookQQ312to300.java";
 			list.add(temp);
 		} else if (1 == 9) {
 			sConstantClassPath = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
 			temp = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\cn\\qssq666\\robot\\business\\RobotContentProvider.java";
 
 			list.add(temp);
+
 			temp = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\cn\\qssq666\\robot\\AddWordActivity.java";
 			list.add(temp);
 			/*
@@ -319,7 +334,12 @@ public class ByteEncodeUtil {
 
 			return;
 		}
-		String result = readTxtFileDecode(path, className);
+		OperaInfo info = readTxtFileDecode(path, className);
+		if (!info.isResult()) {
+			System.err.println("葫芦" + file.getName() + "，因为已经解密,无需再次覆盖文件 " + info.getMessage());
+			return;
+		}
+		String result = info.getDoWhileResultText();
 		if (!writeFile) {
 			System.out.println("忽略,不写入文件");
 			return;
@@ -702,8 +722,10 @@ public class ByteEncodeUtil {
 	 * @param className
 	 * @return
 	 */
-	public static String readTxtFileDecode(String filePath, String className) {
-
+	public static OperaInfo readTxtFileDecode(String filePath, String className) {
+		int decodeCount = 0;
+		int ignoreCount = 0;
+		int errCount = 0;
 		/**
 		 * 加密变量名 和 解密结果
 		 */
@@ -729,9 +751,13 @@ public class ByteEncodeUtil {
 							String temp = matcherMethod.group(1);// 把变量名替换即可
 							String varName = temp.replace(sConstantsClass + ".", "");// 触发类名.
 							if (sDecodeMap.containsKey(varName)) {
+
 								String value = sDecodeMap.get(varName);// 解密后文本在另外一个方法已经处理
+
+								decodeCount++;
 								lineTxt = lineTxt.replace(decodeMethodName + "(" + temp + ")", "\"" + value + "\"");// 对函数进行替换
 								lineTxt = lineTxt.replaceAll("\n", sBrSign);// 处理里的字符串。
+
 								if (lineTxt.indexOf("\n") != -1) {
 									System.err.println("无法替换\n还是存在");
 								}
@@ -741,7 +767,7 @@ public class ByteEncodeUtil {
 								}
 
 							} else {
-
+								errCount++;
 								System.err.println("无法处理变量 因为成员变量中不存在,looadEncodeFieldToHashMap确保解密之前是否调用了加载变量方法,var:" + varName + "\n所处行:\n" + lineTxt);
 							}
 						}
@@ -766,11 +792,18 @@ public class ByteEncodeUtil {
 		 * 
 		 * }
 		 */
-		return sb.toString();
+		OperaInfo info = new OperaInfo();
+		info.setResult(decodeCount > 0);
+		info.setMessage("解密数据总数" + decodeCount + ",无法解密总数:" + errCount);
+		info.setDoWhileResultText(sb.toString());
+		return info;
 	}
 
-	public static String readTxtFileEncode(String filePath, String className) {
-
+	public static OperaInfo readTxtFileEncode(String filePath, String className) {
+		OperaInfo info = new OperaInfo();
+		int dowhileCount = 0;
+		int ignoreCount = 0;
+		int existVarCount = 0;
 		/**
 		 * 如果已经存在了则不再进行添加
 		 */
@@ -800,6 +833,7 @@ public class ByteEncodeUtil {
 							// 那么问题来了，\n字符串如何处理换行问题呢、
 							System.out.println("readTxtFileEncode->忽略包含日志行 忽略:" + lineTxt);
 						}
+						ignoreCount++;
 					} else {
 						Pattern pattern = Pattern.compile(patternString);
 
@@ -814,6 +848,7 @@ public class ByteEncodeUtil {
 								if (isChinese || checkZimu(temp)) {
 									String baseVar = getVarBaseName(temp, isChinese);
 									if (!sEncodeMap.containsKey(baseVar)) {
+										existVarCount++;
 										// 生成注释声明
 										/*
 										 * 下面这句话实现变量申明字符串
@@ -833,7 +868,8 @@ public class ByteEncodeUtil {
 									}
 
 									lineTxt = lineTxt.replace(matchBase, getDecodeMethodNameCall(sConstantsClass + "." + baseVar));// 把"ffd"替换为
-																																	// 解密方法.sss(常量类.变量名)
+									dowhileCount++;
+									// 解密方法.sss(常量类.变量名)
 									if (debug) {
 										System.out.println("lineTextAfter:" + lineTxt);
 									}
@@ -856,7 +892,15 @@ public class ByteEncodeUtil {
 			System.out.println("读取文件内容出错");
 			e.printStackTrace();
 		}
-		return sb.toString();
+		if (dowhileCount > 0) {
+			info.setResult(true);
+		} else {
+			info.setResult(false);
+
+		}
+		info.setMessage("忽略总数" + ignoreCount + ",进行加密的总数:" + dowhileCount + ",其中有" + existVarCount + "个常量重复,被共用");
+		info.setDoWhileResultText(sb.toString());
+		return info;
 	}
 
 	/**
@@ -1048,50 +1092,124 @@ public class ByteEncodeUtil {
 	}
 
 	static boolean isIgNoreDecodeText(String text, boolean isdecodeConstants) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
-		String temp=text.replaceAll(" ", "");
-			if(temp.startsWith("//")){
-				if(debug){
-					System.out.println("忽略行注释//"+text);
-				}
-				return true;//注释行忽略，
+		String temp = text.replaceAll(" ", "");
+		temp = temp.replaceAll("	", "");
+		if (temp.contains("ignore_exclude")) {
+			return false;// 表示必须加密的，
+		}
+		if (temp.contains("ignore_start") || temp.contains("regoin_start")) {
+			enteIgnoreBlock = true;
+			if (debug) {
+				System.out.println("进入忽略忽略区域, " + text);
 			}
-			if(temp.startsWith("/*") && temp.indexOf("*/")!=-1){
-				if(debug){
-					System.out.println("忽略行块注释 "+text);
-				}
-				return true;
+			return true;
+		}
+
+		if (temp.contains("ignore_end") || temp.contains("regoin_end")) {
+			enteIgnoreBlock = false;
+			if (debug) {
+				System.out.println("进入忽略忽略区域, " + text);
 			}
-			if(temp.startsWith("/*")){
-				if(debug){
-					System.out.println("忽略行注释,start/"+text);
-				}
-				enteBlockComment=true;
-				return true;
-			}else if(temp.indexOf("*/")!=-1){
-				enteBlockComment=false;
-				if(debug){
-					System.out.println("忽略行注释,end "+text);
-				}
-				return true;
+			return true;
+		}
+		if (enteIgnoreBlock) {
+			if (debug) {
+				System.out.println("属于自定义忽略航快区域, " + text);
 			}
-			if(enteBlockComment){
-				if(debug){
-					System.out.println("属于航快区域, "+text);
-				}
-				return true;
+			return true;
+		}
+		if (temp.startsWith("/*") && temp.indexOf("*/") != -1) {
+			if (debug) {
+				System.out.println("忽略行块注释 " + text);
 			}
-		
-		
-		
-		
-		
+			return true;
+		}
+
+		if (temp.startsWith("//")) {
+			if (debug) {
+				System.out.println("忽略行注释//" + text);
+			}
+			return true;// 注释行忽略，
+		}
+		if (temp.startsWith("/*")) {
+			if (debug) {
+				System.out.println("忽略行注释,start/" + text);
+			}
+			enteBlockComment = true;
+			return true;
+		} else if (temp.indexOf("*/") != -1) {
+			enteBlockComment = false;
+			if (debug) {
+				System.out.println("忽略行注释,end " + text);
+			}
+			return true;
+		}
+
+		if (enteBlockComment) {
+			if (debug) {
+				System.out.println("属于航快区域, " + text);
+			}
+			return true;
+		}
+
 		if (isdecodeConstants) {
 
 			return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || text.toUpperCase().contains("QSSQUtils.Log".toUpperCase());
 		}
-// QSSQUtils.Log(
-		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG")  || text.toUpperCase().contains("QSSQUtils.Log".toUpperCase())|| (text.contains("final") && text.contains("static"));
+		// QSSQUtils.Log(
+		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || text.toUpperCase().contains("QSSQUtils.Log".toUpperCase()) || (text.contains("final") && text.contains("static"));
 	}
-	public static boolean enteBlockComment=false;
-	
+
+	public static boolean enteBlockComment = false;
+	public static boolean enteIgnoreBlock = false;
+
+	public static class OperaInfo {
+		OperaInfo() {
+
+		}
+
+		@Override
+		public String toString() {
+			return "OpearaInfo [doWhileResultText=" + doWhileResultText + ", message=" + message + ", result=" + result + ", code=" + code + "]";
+		}
+
+		String doWhileResultText;
+
+		public String getDoWhileResultText() {
+			return doWhileResultText;
+		}
+
+		public void setDoWhileResultText(String doWhileResultText) {
+			this.doWhileResultText = doWhileResultText;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public void setMessage(String message) {
+			this.message = message;
+		}
+
+		public boolean isResult() {
+			return result;
+		}
+
+		public void setResult(boolean result) {
+			this.result = result;
+		}
+
+		public int getCode() {
+			return code;
+		}
+
+		public void setCode(int code) {
+			this.code = code;
+		}
+
+		String message;
+		boolean result;
+		int code;
+	}
+
 }
