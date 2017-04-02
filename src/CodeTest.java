@@ -67,7 +67,7 @@ public class CodeTest {
 		for (int i = 0; i < ints.length; i++) {
 			StringBuffer tempsb = new StringBuffer();
 			tempsb.append("" + "srcCode:" + ints[i]);
-			ints[i] = ByteEncodeUtil.getDecodeIntValue(ints[i]);
+			ints[i] = ByteEncodeUtil.getDecodeIntValue(ints[i],1);
 			tempsb.append("解密后:" + ints[i]);
 			chars[i] = (char) ints[i];
 			System.out.println("【解密】" + tempsb.toString());
@@ -138,7 +138,7 @@ public class CodeTest {
 		int[] intArray = new int[chars.length];
 		for (int i = 0; i < chars.length; i++) {
 			intArray[i] = chars[i];
-			intArray[i] = ByteEncodeUtil.getEncodeIntValue(intArray[i]);
+			intArray[i] = ByteEncodeUtil.getEncodeIntValue(intArray[i],1);
 
 		}
 		return intArray;

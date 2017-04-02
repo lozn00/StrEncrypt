@@ -21,7 +21,11 @@ public class HanyuPinyinHelper {
         try {
             for (int i=0; i<cl_chars.length; i++){
                 if (String.valueOf(cl_chars[i]).matches("[\u4e00-\u9fa5]+")){// 如果字符是中文,则将中文转为汉语拼音
-                    hanyupinyin += PinyinHelper.toHanyuPinyinStringArray(cl_chars[i], defaultFormat)[0];
+                String[] temp = PinyinHelper.toHanyuPinyinStringArray(cl_chars[i], defaultFormat);
+                if(temp!=null&&temp.length>0){
+                	hanyupinyin += temp[0];
+                }
+                
                 } else {// 如果字符不是中文,则不转换
                     hanyupinyin += cl_chars[i];
                 }

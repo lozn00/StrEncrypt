@@ -18,10 +18,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 public class ByteEncodeUtil {
-
+/**
+ * 更换加密方式的时候应该把原来储存的常量删除，否则导致还是原来的加密
+ */
 	static HashMap<String, String> sEncodeMap = new HashMap<>();
 	public static String sConstantsClass = "ConstantValue";
-	public static String sConstantClassPath = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
+	public static String sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
 
 	static HanyuPinyinHelper hanyuPinyinHelper = new HanyuPinyinHelper();
 	/**
@@ -65,7 +67,7 @@ public class ByteEncodeUtil {
 		lineText = lineText.replaceAll("\n", sBrSign);
 		System.out.println("解析后替换变量结果" + lineText);
 		debug = true;
-		// decodeJavaAndroid();
+//		decodeJavaAndroid();
 		encodeJavaAndroid();
 
 		// encodeJavaAndroid();
@@ -88,10 +90,10 @@ public class ByteEncodeUtil {
 		// System.out.println(getVarBaseName("~·！@#￥%……&*（）——+=-【】、‘；、。，",
 		// false));
 		// System.out.println(getVarBaseName("test.#$%&!@#$^&*()_", false));
-		// doEncodeAllJava("F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\tui\\fw.java");
+		// doEncodeAllJava("F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\tui\\fw.java");
 		// doEncodeAllJava("src/fw.txt");
 		// String file =
-		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\tui\\qqplugin.java";
+		// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\tui\\qqplugin.java";
 		// debug=true;
 		/**
 		 * 对于换行符用brbr处理
@@ -127,34 +129,34 @@ public class ByteEncodeUtil {
 			doDecodeAllJava(file);
 		}
 		// file =
-		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\InitConfig.java";
+		// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\InitConfig.java";
 		// file =
-		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
+		// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
 		// file =
-		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
+		// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
 		// file =
-		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
+		// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
 		// file =
-		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
+		// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
 		// file =
-		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
+		// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
 		// file =
-		// "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\qqplugin.java";
+		// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\qqplugin.java";
 		/*
 		 * file =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\PublicConstants.java";
+		 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\PublicConstants.java";
 		 * doDecodeAllJava(file);
 		 * 
 		 * file =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
+		 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
 		 * doDecodeAllJava(file); file =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
+		 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
 		 * doDecodeAllJava(file); file =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
+		 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
 		 * doDecodeAllJava(file); file =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
+		 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
 		 * doDecodeAllJava(file); file =
-		 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QQUnrecalledHook.java";
+		 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QQUnrecalledHook.java";
 		 */
 
 	}
@@ -240,7 +242,7 @@ public class ByteEncodeUtil {
 	private static ArrayList<String> getFileArrayList() {
 		String temp = "";
 		ArrayList<String> list = new ArrayList<String>();
-		if (8 == 8) {// 加密情插件
+		if (8 == 11) {// 加密情插件
 			sConstantsClass = "Constants";
 			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\Constants.java";
 			enableNewEncrypt = true;
@@ -251,15 +253,27 @@ public class ByteEncodeUtil {
 			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\SetingFragment.java";
 			 * list.add(temp);
 			 */
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\WeChatVersionInit.java";
+			temp= "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
+			  list.add(temp); 
+			/*temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\WeChatVersionInit.java";
 			list.add(temp);
 			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\QQVersionInit.java";
 			list.add(temp);
 			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookTIMQQ.java";
 			list.add(temp);
 			temp =   "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookQQ312to300.java";
+			list.add(temp);*/
+		}else if(99==99){//插入微信Sscon
+			enableNewEncrypt = true;
+			sConstantClassPath="F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
+				temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\Control.java";
 			list.add(temp);
-		} else if (1 == 9) {
+			temp="F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\UiUtils.java";
+			list.add(temp);
+		} else if (11 == 111) {
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
+			list.add(temp);
+		}  else if (1 == 9) {
 			sConstantClassPath = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
 			temp = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\cn\\qssq666\\robot\\business\\RobotContentProvider.java";
 
@@ -269,37 +283,37 @@ public class ByteEncodeUtil {
 			list.add(temp);
 			/*
 			 * temp =
-			 * "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
+			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
 			 * list.add(temp);
 			 */
 		} else if (false == true) {
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\TestVar.java";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\TestVar.java";
 			list.add(temp);
 		} else if (11 == 111) {
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
 			list.add(temp);
 		} else {
 
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\util\\robot\\RobotUtil.java";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\util\\robot\\RobotUtil.java";
 			list.add(temp);
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
 			list.add(temp);
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
 			list.add(temp);
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QQUnrecalledHook.java";
-			list.add(temp);
-
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QQUnrecalledHook.java";
 			list.add(temp);
 
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
 			list.add(temp);
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
+
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\DS.java";
+			list.add(temp);
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\Cf.java";
 
 			list.add(temp);
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\qqplugin.java";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\qqplugin.java";
 			list.add(temp);
-			temp = "F:\\src\\git_project\\MyApplication2\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\InitConfig.java";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\InitConfig.java";
 			list.add(temp);
 		}
 
@@ -337,7 +351,7 @@ public class ByteEncodeUtil {
 		}
 		OperaInfo info = readTxtFileDecode(path, className);
 		if (!info.isResult()) {
-			System.err.println("葫芦" + file.getName() + "，因为已经解密,无需再次覆盖文件 " + info.getMessage());
+			System.err.println("忽略" + file.getName() + "，因为已经解密,无需再次覆盖文件 " + info.getMessage());
 			return;
 		}
 		String result = info.getDoWhileResultText();
@@ -442,9 +456,13 @@ public class ByteEncodeUtil {
 		temp = temp.replaceAll("\\|", "_spt_");
 		temp = temp.replaceAll(":", "_mh_");
 		temp = temp.replaceAll("！", "_GTH_");
+		temp = temp.replaceAll("	", "");
+		temp = temp.replaceAll(" ", "");
 		String temp1 = "QSSQ_" + (isChinese ? hanyuPinyinHelper.toHanyuPinyin(temp) : temp);
 		if (temp1.length() > 40) {
-			temp1 = temp1.substring(0, 20) + MD5Util.MD5Encode(temp1);
+			String frist=temp1.substring(0, 20);
+			frist=frist.replaceAll(" ", "");
+			temp1 = frist + MD5Util.MD5Encode(temp1);
 		}
 		return temp1;
 	}
@@ -1151,7 +1169,7 @@ public class ByteEncodeUtil {
 
 		if (enteBlockComment) {
 			if (debug) {
-				System.out.println("属于航快区域, " + text);
+				System.out.println("属于行block区域, " + text);
 			}
 			return true;
 		}
