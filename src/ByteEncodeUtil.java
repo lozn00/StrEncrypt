@@ -270,6 +270,9 @@ public class ByteEncodeUtil {
 			list.add(temp);
 			temp="F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\UiUtils.java";
 			list.add(temp);
+			
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\Cf.java";
+			list.add(temp);
 		} else if (11 == 111) {
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
 			list.add(temp);
@@ -281,6 +284,7 @@ public class ByteEncodeUtil {
 
 			temp = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\cn\\qssq666\\robot\\AddWordActivity.java";
 			list.add(temp);
+			
 			/*
 			 * temp =
 			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
@@ -292,6 +296,9 @@ public class ByteEncodeUtil {
 		} else if (11 == 111) {
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
 			list.add(temp);
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
+			list.add(temp);
+		
 		} else {
 
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\util\\robot\\RobotUtil.java";
@@ -1109,7 +1116,12 @@ public class ByteEncodeUtil {
 	static boolean isIgNoreDecodeText(String text) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
 		return isIgNoreDecodeText(text, false);
 	}
-
+	/**
+	 * 
+	 * @param text
+	 * @param isdecodeConstants 貌似是一个写错的东西，
+	 * @return
+	 */
 	static boolean isIgNoreDecodeText(String text, boolean isdecodeConstants) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
 		String temp = text.replaceAll(" ", "");
 		temp = temp.replaceAll("	", "");
@@ -1173,15 +1185,24 @@ public class ByteEncodeUtil {
 			}
 			return true;
 		}
-
+		if(!encryptStaticConstants){
+			if(text.contains("final") && text.contains("static")){
+				return true;
+			}
+		}
 		if (isdecodeConstants) {
 
 			return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || text.toUpperCase().contains("QSSQUtils.Log".toUpperCase());
 		}
+		
+		
 		// QSSQUtils.Log(
-		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || text.toUpperCase().contains("QSSQUtils.Log".toUpperCase()) || (text.contains("final") && text.contains("static"));
+		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || text.toUpperCase().contains("QSSQUtils.Log".toUpperCase()) ;
 	}
-
+	/**
+	 * 忽略包含static final的常量
+	 */
+	public static boolean encryptStaticConstants=true;
 	public static boolean enteBlockComment = false;
 	public static boolean enteIgnoreBlock = false;
 
