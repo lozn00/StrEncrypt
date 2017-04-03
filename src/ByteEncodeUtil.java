@@ -1186,7 +1186,7 @@ public class ByteEncodeUtil {
 			return true;
 		}
 		if(!encryptStaticConstants){
-			if(text.contains("final") && text.contains("static")){
+			if(text.contains("final") && text.contains("static") && !text.contains("TAG")){
 				return true;
 			}
 		}
