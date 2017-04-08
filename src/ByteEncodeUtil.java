@@ -1228,7 +1228,7 @@ public class ByteEncodeUtil {
 		if (temp.contains("ignore_include")) {
 			return true;// 表示无需加密
 		}
-		if (temp.contains("ignore_start") || temp.contains("regoin_start")) {
+		if (temp.toLowerCase().contains("ignore_start") || temp.toLowerCase().contains("regoin_start")) {
 			enteIgnoreBlock = true;
 			if (debug) {
 				System.out.println("进入忽略忽略区域, " + text);
@@ -1236,7 +1236,7 @@ public class ByteEncodeUtil {
 			return true;
 		}
 
-		if (temp.contains("ignore_end") || temp.contains("regoin_end")) {
+		if (temp.toLowerCase().contains("ignore_end") || temp.toLowerCase().contains("regoin_end")) {
 			enteIgnoreBlock = false;
 			if (debug) {
 				System.out.println("进入忽略忽略区域, " + text);
