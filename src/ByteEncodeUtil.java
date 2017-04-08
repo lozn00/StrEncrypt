@@ -2,6 +2,7 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,9 +19,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 public class ByteEncodeUtil {
-/**
- * 更换加密方式的时候应该把原来储存的常量删除，否则导致还是原来的加密
- */
+	/**
+	 * 更换加密方式的时候应该把原来储存的常量删除，否则导致还是原来的加密
+	 */
 	static HashMap<String, String> sEncodeMap = new HashMap<>();
 	public static String sConstantsClass = "ConstantValue";
 	public static String sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
@@ -36,6 +37,7 @@ public class ByteEncodeUtil {
 	 * 多个文件共享变量 是已经生产的 变量名和机解密的字符串
 	 */
 	static HashMap<String, String> sDecodeMap = new HashMap<>();
+	static ArrayList<String> sIgnoreFileList = new ArrayList<>();
 
 	private static final String sIGNORE_DECODE = "IGNORE_DECODE";
 	/*
@@ -45,9 +47,10 @@ public class ByteEncodeUtil {
 	 * \s*int\[\s*\]\s*(\w*)\s*\=\s*new\s*int\[\s*\]\s*\{(.*?)\}
 	 * ="\\s*int\\[\\s*\\]\\s*(\\w*)\\s*\\=\\s*new\\s*int\\[\\s*\\]\\s*\\{(.*?)\\}";
 	 */
-	//java里面必须前面后面加上.*?
+	// java里面必须前面后面加上.*?
 	public static final String encodeLineReg = ".*?\\s*int\\[\\s*\\]\\s*(.+)\\s*\\=\\s*new\\s*int\\[\\s*\\]\\s*\\{(.*?)\\}.*?";
-//	public static final String encodeLineReg = ".*?\\s*int\\[\\s*\\]\\s*(\\w*)\\s*\\=\\s*new\\s*int\\[\\s*\\]\\s*\\{(.*?)\\}.*?";
+	// public static final String encodeLineReg =
+	// ".*?\\s*int\\[\\s*\\]\\s*(\\w*)\\s*\\=\\s*new\\s*int\\[\\s*\\]\\s*\\{(.*?)\\}.*?";
 	// public static final String encodeLineReg
 	// =".*?int\\[\\s*\\](\\s*).*?\\=.*?\\{(.*?)\\}.*?";
 	public static boolean printSmallCode = false;
@@ -67,8 +70,8 @@ public class ByteEncodeUtil {
 		lineText = lineText.replaceAll("\n", sBrSign);
 		System.out.println("解析后替换变量结果" + lineText);
 		debug = true;
-//		decodeJavaAndroid();
-		encodeJavaAndroid();
+//		 decodeJavaAndroid();
+	encodeJavaAndroid();
 
 		// encodeJavaAndroid();
 		/*
@@ -98,14 +101,23 @@ public class ByteEncodeUtil {
 		/**
 		 * 对于换行符用brbr处理
 		 */
-		String temp = "再次申明软件是永久,免费体验的,如果你是从别人手里付费购买的,请邮箱举报，我将把此人拉入黑名单" + "brbr体验完毕请24小时内删除,不删除是你的事情哈!一切违法行为与我无关" + "brbr,任何进行牟利的行为都是违法的,不管你是不是未成年人,请自重!搞大了蹲监狱!!! " + "brbr想了很久还是留个联系方式吧!如果您已被骗希望下次不要被骗了，也希望你不要做这种人,看见一次鄙视一次、" + "brbr关注更新请访问http://qssq666.cn/update/qq_redpackaget.html    " + "brbr为了防止更多的人被骗举报收费邮箱:qssq666@foxmail.com    " + "brbr出现未知无法领取的错误建议卸载有风险软件,重装本软件,向作者提交问题一定要说清楚问题,而不是作者追问你具体怎么怎么个现象,你做了什么  " + "brbr给我弹视频语音的人直接拉黑不解释!  " + "brbr软件会持续更新,告诉大家的好消息是我的行动将掀起自带QQ抢红包狂潮哈 " + "brbr我呢是工资阶层,做这个东西呢只能晚上  " + "brbr双休去搞,时间不是很多,还有就是这破网上传速度太慢,自带的包文件大,所以更新比较慢,出现问题不会马上进行更新,不然我早上传很多个版本了." + "brbr所以希望大家谅解,理解 你这么喷我软件这么这么垃圾我还有毛线的动力啊,你说我单身狗双休都在搞这些玩意,有多狼狈你能体会吗？brbr" + "brbr光知道喷,另外想加群的朋友可以点击http://qssq666.cn点击关于加入群哈!这里就不贴出来了..";
-		// System.out.println("input result:" + getVarName(temp, true));
-		// decodeJavaAndroid();
-		// arrayList.add(printCharCode(charArrayToIntArray("查询昵称信息失败\n情给予QQ访问应用列表权限".toCharArray())));
-		// arrayList.add(printCharCode(charArrayToIntArray("请先手动领取一个红包".toCharArray())));
-		// arrayList.add(printCharCode(charArrayToIntArray("情迁红包出现错误%s".toCharArray())));
-		// arrayList.add(printCharCode(charArrayToIntArray("请先手动领取一个红包或请先打开QQ".toCharArray())));
-		// arrayList.add(printCharCode(charArrayToIntArray("不带密码抢".toCharArray())));
+		String temp = "再次申明软件是永久,免费体验的,如果你是从别人手里付费购买的,请邮箱举报，我将把此人拉入黑名单" + "brbr体验完毕请24小时内删除,不删除是你的事情哈!一切违法行为与我无关"
+				+ "brbr,任何进行牟利的行为都是违法的,不管你是不是未成年人,请自重!搞大了蹲监狱!!! "
+				+ "brbr想了很久还是留个联系方式吧!如果您已被骗希望下次不要被骗了，也希望你不要做这种人,看见一次鄙视一次、"
+				+ "brbr关注更新请访问http://qssq666.cn/update/qq_redpackaget.html    "
+				+ "brbr为了防止更多的人被骗举报收费邮箱:qssq666@foxmail.com    "
+				+ "brbr出现未知无法领取的错误建议卸载有风险软件,重装本软件,向作者提交问题一定要说清楚问题,而不是作者追问你具体怎么怎么个现象,你做了什么  " + "brbr给我弹视频语音的人直接拉黑不解释!  "
+				+ "brbr软件会持续更新,告诉大家的好消息是我的行动将掀起自带QQ抢红包狂潮哈 " + "brbr我呢是工资阶层,做这个东西呢只能晚上  "
+				+ "brbr双休去搞,时间不是很多,还有就是这破网上传速度太慢,自带的包文件大,所以更新比较慢,出现问题不会马上进行更新,不然我早上传很多个版本了."
+				+ "brbr所以希望大家谅解,理解 你这么喷我软件这么这么垃圾我还有毛线的动力啊,你说我单身狗双休都在搞这些玩意,有多狼狈你能体会吗？brbr"
+				+ "brbr光知道喷,另外想加群的朋友可以点击http://qssq666.cn点击关于加入群哈!这里就不贴出来了..";
+				// System.out.println("input result:" + getVarName(temp, true));
+				// decodeJavaAndroid();
+				// arrayList.add(printCharCode(charArrayToIntArray("查询昵称信息失败\n情给予QQ访问应用列表权限".toCharArray())));
+				// arrayList.add(printCharCode(charArrayToIntArray("请先手动领取一个红包".toCharArray())));
+				// arrayList.add(printCharCode(charArrayToIntArray("情迁红包出现错误%s".toCharArray())));
+				// arrayList.add(printCharCode(charArrayToIntArray("请先手动领取一个红包或请先打开QQ".toCharArray())));
+				// arrayList.add(printCharCode(charArrayToIntArray("不带密码抢".toCharArray())));
 
 		// deAndroid();
 		// String file = "F:\\QQ_weichat\\test\\Test.java";
@@ -189,10 +201,24 @@ public class ByteEncodeUtil {
 			if (listFile != null) {
 				for (int i = 0; i < listFile.length; i++) {
 					if (listFile[i].isDirectory()) {
-						doEncodeAllJava(path);
+						File[] currenChildFile = listFile[i].listFiles();
+						
+						doEncodeAllJava(listFile[i].getAbsolutePath());
 					} else {
-						doEncodeAllJava(path);
+						doEncodeAllJava(listFile[i].getAbsolutePath());
 					}
+				}
+			}
+		}else{
+			if(path.equals(sConstantClassPath)){
+				if (!writeFile) {
+					System.out.println("忽略 常量文件无需加密"+sConstantClassPath);
+					return;
+				}
+			}else{
+				if(sIgnoreFileList.contains(path)){
+					System.err.println("发现指定的忽略文件列表中，无需加密："+path);
+					return;
 				}
 			}
 		}
@@ -253,30 +279,42 @@ public class ByteEncodeUtil {
 			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\SetingFragment.java";
 			 * list.add(temp);
 			 */
-			temp= "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
-			  list.add(temp); 
-			/*temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\WeChatVersionInit.java";
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
 			list.add(temp);
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\QQVersionInit.java";
-			list.add(temp);
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookTIMQQ.java";
-			list.add(temp);
-			temp =   "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookQQ312to300.java";
-			list.add(temp);*/
-		}else if(99==99){//插入微信Sscon
+			/*
+			 * temp =
+			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\WeChatVersionInit.java";
+			 * list.add(temp); temp =
+			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\QQVersionInit.java";
+			 * list.add(temp); temp =
+			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookTIMQQ.java";
+			 * list.add(temp); temp =
+			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookQQ312to300.java";
+			 * list.add(temp);
+			 */
+		} else if (99 == 99) {// 插入微信Sscon
 			enableNewEncrypt = true;
-			sConstantClassPath="F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
-				temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\Control.java";
+			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
+//			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat";
 			list.add(temp);
-			temp="F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\UiUtils.java";
-			list.add(temp);
-			
-			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\Cf.java";
-			list.add(temp);
+			sIgnoreFileList.add("F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\EncryptUtil.java");
+			// temp =
+			// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\Control.java";
+			// list.add(temp);
+			/*
+			 * temp=
+			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\UiUtils.java";
+			 * list.add(temp);
+			 * 
+			 * temp =
+			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\Cf.java";
+			 * list.add(temp);
+			 */
 		} else if (11 == 111) {
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
 			list.add(temp);
-		}  else if (1 == 9) {
+		} else if (1 == 9) {
 			sConstantClassPath = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
 			temp = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\cn\\qssq666\\robot\\business\\RobotContentProvider.java";
 
@@ -284,7 +322,7 @@ public class ByteEncodeUtil {
 
 			temp = "F:\\QQ_weichat\\smali_debug\\MyApplicationQQRobot\\qqrobot1\\app\\src\\main\\java\\cn\\qssq666\\robot\\AddWordActivity.java";
 			list.add(temp);
-			
+
 			/*
 			 * temp =
 			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\fw.java";
@@ -298,7 +336,7 @@ public class ByteEncodeUtil {
 			list.add(temp);
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\QTA.java";
 			list.add(temp);
-		
+
 		} else {
 
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\util\\robot\\RobotUtil.java";
@@ -341,9 +379,9 @@ public class ByteEncodeUtil {
 			if (listFile != null) {
 				for (int i = 0; i < listFile.length; i++) {
 					if (listFile[i].isDirectory()) {
-						doEncodeAllJava(path);
+						doDecodeAllJava(listFile[i].getAbsolutePath());
 					} else {
-						doEncodeAllJava(path);
+						doDecodeAllJava(listFile[i].getAbsolutePath());
 					}
 				}
 			}
@@ -467,8 +505,8 @@ public class ByteEncodeUtil {
 		temp = temp.replaceAll(" ", "");
 		String temp1 = "QSSQ_" + (isChinese ? hanyuPinyinHelper.toHanyuPinyin(temp) : temp);
 		if (temp1.length() > 40) {
-			String frist=temp1.substring(0, 20);
-			frist=frist.replaceAll(" ", "");
+			String frist = temp1.substring(0, 20);
+			frist = frist.replaceAll(" ", "");
 			temp1 = frist + MD5Util.MD5Encode(temp1);
 		}
 		return temp1;
@@ -498,9 +536,9 @@ public class ByteEncodeUtil {
 
 	public static void readEncodeVarArrayList(ArrayList<String> list) {
 
-		String constantClassSrc;// 这个值不断的变化叠加。不会反悔null.
+	String  constantClassSrc;// 这个值不断的变化叠加。不会反悔null.
 		try {
-			constantClassSrc = FileUtils.readFileToString(new File(sConstantClassPath), "utf-8");
+			constantClassSrc= FileUtils.readFileToString(new File(sConstantClassPath), "utf-8");
 		} catch (IOException e1) {
 
 			e1.printStackTrace();
@@ -509,8 +547,21 @@ public class ByteEncodeUtil {
 
 		for (int i = 0; i < list.size(); i++) {
 			String file = list.get(i);
-			String className = getClassNameByFile(new File(file));
-			constantClassSrc = readEncodeVarAndInsert(file, className, constantClassSrc);// className用于判断到底属于那个类的变量
+			File fileManager = new File(file);
+			if (fileManager.isDirectory()) {
+				File[] dir = fileManager.listFiles();
+				constantClassSrc = readEncodeVarAndInsert(dir,  constantClassSrc);
+			/*	for (int j = 0; j < dir.length; j++) {
+					File currentFile = dir[i];
+					String className = getClassNameByFile(currentFile);
+				String temp=	constantClassSrc.toString();
+					constantClassSrc=readEncodeVarAndInsert(currentFile.getAbsolutePath(), className, temp);// className用于判断到底属于那个类的变量
+				}*/
+			} else {
+	
+				constantClassSrc = readEncodeVarAndInsert(file,  constantClassSrc);// className用于判断到底属于那个类的变量
+			}
+
 		}
 		;
 		/*
@@ -527,93 +578,105 @@ public class ByteEncodeUtil {
 		}
 	}
 
-	public static String readEncodeVarAndInsert(String filePath, String className, String vardeclareJava) {
-
+	public static String readEncodeVarAndInsert(String filePath,  String vardeclareJava) {
+		return readEncodeVarAndInsert(new File[]{new File(filePath)},  vardeclareJava);
+	}
+	public static String readEncodeVarAndInsert(File[] filePath,  String vardeclareJava) {
+		
 		/**
 		 * 如果已经存在了则不再进行添加
 		 */
-
+		
 		// System.out.println();
-
+		
 		String patternString = "\"(.*?)\"";// 取出双引号
 		StringBuffer sb = new StringBuffer();
 		StringBuffer varNameSb = new StringBuffer();
-		varNameSb.append(getInsertSplitLine(className));
+		
 		try {
 			String encoding = "utf-8";
-			File file = new File(filePath);
-			if (file.isFile() && file.exists()) { // 判断文件是否存在
-				InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);// 考虑到编码格式
-				BufferedReader bufferedReader = new BufferedReader(read);
-				String lineTxt = null;
-
-				while ((lineTxt = bufferedReader.readLine()) != null) {
-					// 匹配类似velocity规则的字符串
-					// 生成匹配模式的正则表达式
-					Pattern pattern = Pattern.compile(patternString);
-
-					Matcher matcher = pattern.matcher(lineTxt);
-
-					// 两个方法：appendReplacement, appendTail
-					if (isIgNoreDecodeText(lineTxt)) {// 一般情况下这是一个私有的字段
-														// 忽略
-						if (debug) {
-							// 那么问题来了，\n字符串如何处理换行问题呢、
-							System.err.println("忽略包含日志行 忽略:" + lineTxt);
-						}
-					} else {
-
-						while (matcher.find()) {
-							String matchBase = matcher.group();
-							// System.err.println("match:" +);//这里匹配返回的包含引号
-							String temp = matcher.group(1);// 不包含双引号
-							if (temp != null && temp != "" && temp != "," && temp != "&" && temp.length() > 0) {
-								boolean isChinese = checkChinese(temp);
-
-								if (isChinese || checkZimu(temp)) {
-									String baseVar = getVarBaseName(temp, isChinese);
-									if (!sEncodeMap.containsKey(baseVar)) {
-										if (sDecodeMap.containsKey(baseVar)) {
-											sEncodeMap.put(baseVar, "");
-											if (debug) {
-												System.err.println("解码常量表已定义变量:" + baseVar + ",line:" + temp);
-											}
-											continue;
-										}
-										// 生成注释声明
-										varNameSb.append("/**\n" + temp + "\n*/\n");
-										/*
-										 * 下面这句话实现变量申明字符串
-										 */
-										// 生成
-										varNameSb.append(getVarName(baseVar) + StringToCharCodeJava(temp) + "//content=" + temp + "\n\n");
-										if (debug) {
-											System.out.println("创建字段:" + baseVar + ",value:" + temp);
-										}
-										sEncodeMap.put(baseVar, "");
-									} else {
-										if (debug) {
-
-											System.err.println("忽略已存在的字段:" + baseVar);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				read.close();
-			} else {
-				System.out.println("找不到指定的文件" + file.getAbsolutePath());
-				throw new RuntimeException("找不到指定的文件" + filePath);
+			for (int i = 0; i < filePath.length; i++) {
+				doTempConstants(filePath[i], patternString, varNameSb, encoding);
 			}
 		} catch (Exception e) {
 			System.out.println("读取文件内容出错");
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+		return insertFieldAtClassAfter( vardeclareJava, varNameSb.toString());
+	}
+
+	private static void doTempConstants(File filePath, String patternString, StringBuffer varNameSb, String encoding)
+			throws UnsupportedEncodingException, FileNotFoundException, IOException {
+		String className = getClassNameByFile(filePath);
 		varNameSb.append(getInsertSplitLine(className));
-		return insertFieldAtClassAfter(className, vardeclareJava, varNameSb.toString());
+		File file = filePath;
+		if (file.exists() || file.isDirectory()) { // 判断文件是否存在
+			InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);// 考虑到编码格式
+			BufferedReader bufferedReader = new BufferedReader(read);
+			String lineTxt = null;
+
+			while ((lineTxt = bufferedReader.readLine()) != null) {
+				// 匹配类似velocity规则的字符串
+				// 生成匹配模式的正则表达式
+				Pattern pattern = Pattern.compile(patternString);
+
+				Matcher matcher = pattern.matcher(lineTxt);
+
+				// 两个方法：appendReplacement, appendTail
+				if (isIgNoreDecodeText(lineTxt)) {// 一般情况下这是一个私有的字段
+													// 忽略
+					if (debug) {
+						// 那么问题来了，\n字符串如何处理换行问题呢、
+						System.err.println("忽略包含日志行 忽略:" + lineTxt);
+					}
+				} else {
+
+					while (matcher.find()) {
+						String matchBase = matcher.group();
+						// System.err.println("match:" +);//这里匹配返回的包含引号
+						String temp = matcher.group(1);// 不包含双引号
+						if (temp != null && temp != "" && temp != "," && temp != "&" && temp.length() > 0) {
+							boolean isChinese = checkChinese(temp);
+
+							if (isChinese || checkZimu(temp)) {
+								String baseVar = getVarBaseName(temp, isChinese);
+								if (!sEncodeMap.containsKey(baseVar)) {
+									if (sDecodeMap.containsKey(baseVar)) {
+										sEncodeMap.put(baseVar, "");
+										if (debug) {
+											System.err.println("解码常量表已定义变量:" + baseVar + ",line:" + temp);
+										}
+										continue;
+									}
+									// 生成注释声明
+									varNameSb.append("/**\n" + temp + "\n*/\n");
+									/*
+									 * 下面这句话实现变量申明字符串
+									 */
+									// 生成
+									varNameSb.append(getVarName(baseVar) + StringToCharCodeJava(temp) + "//content="
+											+ temp + "\n\n");
+									if (debug) {
+										System.out.println("创建字段:" + baseVar + ",value:" + temp);
+									}
+									sEncodeMap.put(baseVar, "");
+								} else {
+									if (debug) {
+
+										System.err.println("忽略已存在的字段:" + baseVar);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			read.close();
+		} else {
+			System.out.println("找不到指定的文件" + file.getAbsolutePath());
+			throw new RuntimeException("找不到指定的文件" + filePath);
+		}
 	}
 
 	/*
@@ -794,7 +857,8 @@ public class ByteEncodeUtil {
 
 							} else {
 								errCount++;
-								System.err.println("无法处理变量 因为成员变量中不存在,looadEncodeFieldToHashMap确保解密之前是否调用了加载变量方法,var:" + varName + "\n所处行:\n" + lineTxt);
+								System.err.println("无法处理变量 因为成员变量中不存在,looadEncodeFieldToHashMap确保解密之前是否调用了加载变量方法,var:"
+										+ varName + "\n所处行:\n" + lineTxt);
 							}
 						}
 					}
@@ -880,7 +944,8 @@ public class ByteEncodeUtil {
 										 * 下面这句话实现变量申明字符串
 										 */
 										// filedNameMap.put(baseVar, "");
-										System.err.println("变量" + baseVar + "不存在,忽略替换" + temp);
+										System.err.println("变量" + baseVar + "不存在,无法进行加密 忽略替换" + temp);
+										continue;
 										// throw new
 										// RuntimeException("找不到对于的变量名:" +
 										// baseVar + "，确保之前已经加载");
@@ -893,7 +958,8 @@ public class ByteEncodeUtil {
 										System.out.println("lineTextBefore:" + lineTxt + ",varName:" + baseVar);
 									}
 
-									lineTxt = lineTxt.replace(matchBase, getDecodeMethodNameCall(sConstantsClass + "." + baseVar));// 把"ffd"替换为
+									lineTxt = lineTxt.replace(matchBase,
+											getDecodeMethodNameCall(sConstantsClass + "." + baseVar));// 把"ffd"替换为
 									dowhileCount++;
 									// 解密方法.sss(常量类.变量名)
 									if (debug) {
@@ -937,7 +1003,7 @@ public class ByteEncodeUtil {
 	 * @param insertContent
 	 * @return
 	 */
-	public static String insertFieldAtClassAfter(String className, String javaSrcFileContent, String insertContent) {
+	public static String insertFieldAtClassAfter( String javaSrcFileContent, String insertContent) {
 		// TODO Auto-generated method stub
 
 		StringBuffer s1 = new StringBuffer(javaSrcFileContent); // 原字符串
@@ -948,7 +1014,7 @@ public class ByteEncodeUtil {
 		if (m.find()) {
 			s1.insert((m.end() + 1), insertContent); // 插入字符串
 		} else {
-			System.err.println("无法匹配匹配无法插入,className:" + className + ",源文件内容:" + javaSrcFileContent);
+			System.err.println("无法匹配匹配无法插入,className:" + sConstantsClass + ",源文件内容:" + javaSrcFileContent);
 			throw new RuntimeException("无法匹配:" + match);
 		}
 
@@ -1116,10 +1182,12 @@ public class ByteEncodeUtil {
 	static boolean isIgNoreDecodeText(String text) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
 		return isIgNoreDecodeText(text, false);
 	}
+
 	/**
 	 * 
 	 * @param text
-	 * @param isdecodeConstants 貌似是一个写错的东西，
+	 * @param isdecodeConstants
+	 *            貌似是一个写错的东西，
 	 * @return
 	 */
 	static boolean isIgNoreDecodeText(String text, boolean isdecodeConstants) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
@@ -1185,24 +1253,26 @@ public class ByteEncodeUtil {
 			}
 			return true;
 		}
-		if(!encryptStaticConstants){
-			if(text.contains("final") && text.contains("static") && !text.contains("TAG")){
+		if (!encryptStaticConstants) {
+			if (text.contains("final") && text.contains("static") && !text.contains("TAG")) {
 				return true;
 			}
 		}
 		if (isdecodeConstants) {
 
-			return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || text.toUpperCase().contains("QSSQUtils.Log".toUpperCase());
+			return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG")
+					|| text.toUpperCase().contains("QSSQUtils.Log".toUpperCase());
 		}
-		
-		
+
 		// QSSQUtils.Log(
-		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG") || text.toUpperCase().contains("QSSQUtils.Log".toUpperCase()) ;
+		return text.toUpperCase().contains(sIGNORE_DECODE) || text.toUpperCase().contains("HOOKLOG")
+				|| text.toUpperCase().contains("QSSQUtils.Log".toUpperCase());
 	}
+
 	/**
 	 * 忽略包含static final的常量
 	 */
-	public static boolean encryptStaticConstants=true;
+	public static boolean encryptStaticConstants = true;
 	public static boolean enteBlockComment = false;
 	public static boolean enteIgnoreBlock = false;
 
@@ -1213,7 +1283,8 @@ public class ByteEncodeUtil {
 
 		@Override
 		public String toString() {
-			return "OpearaInfo [doWhileResultText=" + doWhileResultText + ", message=" + message + ", result=" + result + ", code=" + code + "]";
+			return "OpearaInfo [doWhileResultText=" + doWhileResultText + ", message=" + message + ", result=" + result
+					+ ", code=" + code + "]";
 		}
 
 		String doWhileResultText;
