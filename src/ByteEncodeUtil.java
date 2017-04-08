@@ -70,8 +70,8 @@ public class ByteEncodeUtil {
 		lineText = lineText.replaceAll("\n", sBrSign);
 		System.out.println("解析后替换变量结果" + lineText);
 		debug = true;
-//		 decodeJavaAndroid();
-	encodeJavaAndroid();
+		// decodeJavaAndroid();
+		encodeJavaAndroid();
 
 		// encodeJavaAndroid();
 		/*
@@ -202,22 +202,22 @@ public class ByteEncodeUtil {
 				for (int i = 0; i < listFile.length; i++) {
 					if (listFile[i].isDirectory()) {
 						File[] currenChildFile = listFile[i].listFiles();
-						
+
 						doEncodeAllJava(listFile[i].getAbsolutePath());
 					} else {
 						doEncodeAllJava(listFile[i].getAbsolutePath());
 					}
 				}
 			}
-		}else{
-			if(path.equals(sConstantClassPath)){
+		} else {
+			if (path.equals(sConstantClassPath)) {
 				if (!writeFile) {
-					System.out.println("忽略 常量文件无需加密"+sConstantClassPath);
+					System.out.println("忽略 常量文件无需加密" + sConstantClassPath);
 					return;
 				}
-			}else{
-				if(sIgnoreFileList.contains(path)){
-					System.err.println("发现指定的忽略文件列表中，无需加密："+path);
+			} else {
+				if (sIgnoreFileList.contains(path)) {
+					System.err.println("发现指定的忽略文件列表中，无需加密：" + path);
 					return;
 				}
 			}
@@ -295,10 +295,12 @@ public class ByteEncodeUtil {
 		} else if (99 == 99) {// 插入微信Sscon
 			enableNewEncrypt = true;
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
-//			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard";
-			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard";
+			// temp =
+			// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat";
 			list.add(temp);
-			sIgnoreFileList.add("F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\EncryptUtil.java");
+			sIgnoreFileList.add(
+					"F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\EncryptUtil.java");
 			// temp =
 			// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\Control.java";
 			// list.add(temp);
@@ -536,9 +538,9 @@ public class ByteEncodeUtil {
 
 	public static void readEncodeVarArrayList(ArrayList<String> list) {
 
-	String  constantClassSrc;// 这个值不断的变化叠加。不会反悔null.
+		String constantClassSrc;// 这个值不断的变化叠加。不会反悔null.
 		try {
-			constantClassSrc= FileUtils.readFileToString(new File(sConstantClassPath), "utf-8");
+			constantClassSrc = FileUtils.readFileToString(new File(sConstantClassPath), "utf-8");
 		} catch (IOException e1) {
 
 			e1.printStackTrace();
@@ -550,16 +552,18 @@ public class ByteEncodeUtil {
 			File fileManager = new File(file);
 			if (fileManager.isDirectory()) {
 				File[] dir = fileManager.listFiles();
-				constantClassSrc = readEncodeVarAndInsert(dir,  constantClassSrc);
-			/*	for (int j = 0; j < dir.length; j++) {
-					File currentFile = dir[i];
-					String className = getClassNameByFile(currentFile);
-				String temp=	constantClassSrc.toString();
-					constantClassSrc=readEncodeVarAndInsert(currentFile.getAbsolutePath(), className, temp);// className用于判断到底属于那个类的变量
-				}*/
+				constantClassSrc = readEncodeVarAndInsert(dir, constantClassSrc);
+				/*
+				 * for (int j = 0; j < dir.length; j++) { File currentFile =
+				 * dir[i]; String className = getClassNameByFile(currentFile);
+				 * String temp= constantClassSrc.toString();
+				 * constantClassSrc=readEncodeVarAndInsert(currentFile.
+				 * getAbsolutePath(), className, temp);//
+				 * className用于判断到底属于那个类的变量 }
+				 */
 			} else {
-	
-				constantClassSrc = readEncodeVarAndInsert(file,  constantClassSrc);// className用于判断到底属于那个类的变量
+
+				constantClassSrc = readEncodeVarAndInsert(file, constantClassSrc);// className用于判断到底属于那个类的变量
 			}
 
 		}
@@ -578,32 +582,55 @@ public class ByteEncodeUtil {
 		}
 	}
 
-	public static String readEncodeVarAndInsert(String filePath,  String vardeclareJava) {
-		return readEncodeVarAndInsert(new File[]{new File(filePath)},  vardeclareJava);
+	public static String readEncodeVarAndInsert(String filePath, String vardeclareJava) {
+		return readEncodeVarAndInsert(new File[] { new File(filePath) }, vardeclareJava);
 	}
-	public static String readEncodeVarAndInsert(File[] filePath,  String vardeclareJava) {
-		
+
+	public static String readEncodeVarAndInsert(File[] filePath, String vardeclareJava) {
+
 		/**
 		 * 如果已经存在了则不再进行添加
 		 */
-		
+
 		// System.out.println();
-		
+
 		String patternString = "\"(.*?)\"";// 取出双引号
 		StringBuffer sb = new StringBuffer();
 		StringBuffer varNameSb = new StringBuffer();
-		
+
 		try {
 			String encoding = "utf-8";
-			for (int i = 0; i < filePath.length; i++) {
-				doTempConstants(filePath[i], patternString, varNameSb, encoding);
-			}
+			loopEncryptEncodeConstant(filePath, patternString, varNameSb, encoding);
+
 		} catch (Exception e) {
 			System.out.println("读取文件内容出错");
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		return insertFieldAtClassAfter( vardeclareJava, varNameSb.toString());
+		return insertFieldAtClassAfter(vardeclareJava, varNameSb.toString());
+	}
+
+	private static void loopEncryptEncodeConstant(File[] filePath, String patternString, StringBuffer varNameSb,
+			String encoding) throws UnsupportedEncodingException, FileNotFoundException, IOException {
+		for (int i = 0; i < filePath.length; i++) {
+			if (filePath[i] != null) {
+				if (filePath[i].isDirectory()) {
+					File[] currentFiles = filePath[i].listFiles();
+					for (int j = 0; j < currentFiles.length; j++) {
+						if (currentFiles[i].isDirectory()) {
+							loopEncryptEncodeConstant(currentFiles[i].listFiles(), patternString, varNameSb, encoding);
+						} else {
+							doTempConstants(filePath[i], patternString, varNameSb, encoding);
+						}
+
+					}
+
+				} else {
+					doTempConstants(filePath[i], patternString, varNameSb, encoding);
+				}
+			}
+
+		}
 	}
 
 	private static void doTempConstants(File filePath, String patternString, StringBuffer varNameSb, String encoding)
@@ -611,7 +638,9 @@ public class ByteEncodeUtil {
 		String className = getClassNameByFile(filePath);
 		varNameSb.append(getInsertSplitLine(className));
 		File file = filePath;
-		if (file.exists() || file.isDirectory()) { // 判断文件是否存在
+		if (file.isDirectory()) {
+			System.out.println("忽略目录 不加载常量" + file.getAbsolutePath());
+		} else if (file.exists() || !file.isDirectory()) { // 判断文件是否存在
 			InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);// 考虑到编码格式
 			BufferedReader bufferedReader = new BufferedReader(read);
 			String lineTxt = null;
@@ -1003,7 +1032,7 @@ public class ByteEncodeUtil {
 	 * @param insertContent
 	 * @return
 	 */
-	public static String insertFieldAtClassAfter( String javaSrcFileContent, String insertContent) {
+	public static String insertFieldAtClassAfter(String javaSrcFileContent, String insertContent) {
 		// TODO Auto-generated method stub
 
 		StringBuffer s1 = new StringBuffer(javaSrcFileContent); // 原字符串
