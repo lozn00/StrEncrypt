@@ -268,7 +268,7 @@ public class ByteEncodeUtil {
 	private static ArrayList<String> getFileArrayList() {
 		String temp = "";
 		ArrayList<String> list = new ArrayList<String>();
-		if (8 == 11) {// 加密情插件
+		if (8 == 81) {// 加密情插件
 			sConstantsClass = "Constants";
 			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\Constants.java";
 			enableNewEncrypt = true;
@@ -292,7 +292,21 @@ public class ByteEncodeUtil {
 			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookQQ312to300.java";
 			 * list.add(temp);
 			 */
-		} else if (99 == 99) {// 插入微信Sscon
+		} else if (1 == 1) {
+			enableNewEncrypt = true;
+			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\ConstantValue.java";
+			sConstantsClass = "ConstantValue";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard";
+			list.add(temp);
+			// temp =
+			// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\EncryptUtil.java";
+			// list.add(temp);
+			/*
+			 * temp=
+			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\NetQuery.java";
+			 * list.add(temp);
+			 */
+		} else if (99 == 991) {// 插入微信Sscon
 			enableNewEncrypt = true;
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard";
@@ -617,10 +631,11 @@ public class ByteEncodeUtil {
 				if (filePath[i].isDirectory()) {
 					File[] currentFiles = filePath[i].listFiles();
 					for (int j = 0; j < currentFiles.length; j++) {
-						if (currentFiles[i].isDirectory()) {
-							loopEncryptEncodeConstant(currentFiles[i].listFiles(), patternString, varNameSb, encoding);
+						File newFile = currentFiles[j];
+						if (currentFiles[j].isDirectory()) {
+							loopEncryptEncodeConstant(newFile.listFiles(), patternString, varNameSb, encoding);
 						} else {
-							doTempConstants(filePath[i], patternString, varNameSb, encoding);
+							doTempConstants(newFile, patternString, varNameSb, encoding);
 						}
 
 					}
