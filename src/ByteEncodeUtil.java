@@ -492,10 +492,14 @@ public class ByteEncodeUtil {
 		temp = temp.replaceAll("//>", "right_arr_");
 		temp = temp.replaceAll("】", "zhongr");
 		temp = temp.replaceAll("：", "");
+		temp = temp.replaceAll("、", "");
+		temp = temp.replaceAll("，", "");
+		temp = temp.replaceAll("；", "");// 省略号
+		temp = temp.replaceAll("，", "");
 		temp = temp.replaceAll("‘", "_yiyuyan_");// 易语言注释一样奇葩
 		temp = temp.replaceAll("。", "_pointZ_");// 易语言注释一样奇葩
 		temp = temp.replaceAll("……", "_sheng_");// 省略号
-		temp = temp.replaceAll("；", "_fenhaoZ_");// 省略号
+
 		temp = temp.replaceAll("——", "_henganZ_");// 省略号
 		temp = temp.replaceAll("—-", "_henganZ1_");// 没有按shirt
 		temp = temp.replaceAll("\\(", "leftkuohao_");
