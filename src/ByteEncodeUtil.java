@@ -70,8 +70,8 @@ public class ByteEncodeUtil {
 		lineText = lineText.replaceAll("\n", sBrSign);
 		System.out.println("解析后替换变量结果" + lineText);
 		debug = true;
-		// decodeJavaAndroid();
-		encodeJavaAndroid();
+		decodeJavaAndroid();
+//		encodeJavaAndroid();
 
 		// encodeJavaAndroid();
 		/*
@@ -292,7 +292,35 @@ public class ByteEncodeUtil {
 			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookQQ312to300.java";
 			 * list.add(temp);
 			 */
-		} else if (1 == 1) {
+		}else if (5==5) {//机器人加密 
+			
+//			enableNewEncrypt = true;
+//			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstans.java";
+			sConstantClassPath =  "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
+			temp="F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\business\\RobotContentProvider.java";
+			list.add(temp);
+		/*	temp="F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
+			list.add(temp);*/
+			
+		
+		}else if (5==51) {//共同qita微信常量修复qssq6666根目录文件夹
+			
+			enableNewEncrypt = true;
+			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
+			temp = 	"F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666";
+			list.add(temp);
+			
+			
+		
+		}  else if (88==818) {//共同特性包名加密分享
+			
+			enableNewEncrypt = true;
+			sConstantClassPath=    "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\TempConstant.java";
+			sConstantsClass="TempConstant";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666";
+			list.add(temp);
+			
+		}else if (12 == 121) {//加密内置Q文件夹
 			enableNewEncrypt = true;
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\ConstantValue.java";
 			sConstantsClass = "ConstantValue";
@@ -306,7 +334,7 @@ public class ByteEncodeUtil {
 			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\NetQuery.java";
 			 * list.add(temp);
 			 */
-		} else if (99 == 991) {// 插入微信Sscon
+		} else if (99 == 919) {// 插入微信Sscon加密 文件夹批量
 			enableNewEncrypt = true;
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard";
@@ -655,7 +683,7 @@ public class ByteEncodeUtil {
 		File file = filePath;
 		if (file.isDirectory()) {
 			System.out.println("忽略目录 不加载常量" + file.getAbsolutePath());
-		} else if (file.exists() || !file.isDirectory()) { // 判断文件是否存在
+		} else if (file.exists() && !file.isDirectory()) { // 判断文件是否存在
 			InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);// 考虑到编码格式
 			BufferedReader bufferedReader = new BufferedReader(read);
 			String lineTxt = null;
@@ -787,14 +815,14 @@ public class ByteEncodeUtil {
 
 						while (matcher.find()) {
 							String matchBase = matcher.group();// 获取匹配航
-							String temp = matcher.group(1);// 获取匹配yuanzn
+							String temp = matcher.group(1).trim();// 获取匹配yuanzn
 							String arrsStr = matcher.group(2);// 获取匹配yuanzn
 							String[] arr = arr = arrsStr.split(",");
 							String decodeResult = getDeCodeValue(arr);
 							if (debug) {
-								System.out.println("varName:" + temp + ",解密结果:" + decodeResult);
+								System.out.println("varName[" + temp + "]解密结果:" + decodeResult);
 							}
-							sDecodeMap.put(temp, decodeResult);
+							sDecodeMap.put(temp, decodeResult);//sDecodeMap
 							if (needReplace) {
 								lineTxt = "////" + sIGNORE_DECODE + lineTxt;// 不进行删除而是进行注释
 							}
@@ -901,8 +929,8 @@ public class ByteEncodeUtil {
 
 							} else {
 								errCount++;
-								System.err.println("无法处理变量 因为成员变量中不存在,looadEncodeFieldToHashMap确保解密之前是否调用了加载变量方法,var:"
-										+ varName + "\n所处行:\n" + lineTxt);
+								System.err.println("无法处理变量 因为成员变量中不存在,looadEncodeFieldToHashMap确保解密之前是否调用了加载变量方法,var["
+										+ varName + "]\n所处行:\n" + lineTxt);
 							}
 						}
 					}
