@@ -70,8 +70,8 @@ public class ByteEncodeUtil {
 		lineText = lineText.replaceAll("\n", sBrSign);
 		System.out.println("解析后替换变量结果" + lineText);
 		debug = true;
-		decodeJavaAndroid();
-//		encodeJavaAndroid();
+//		decodeJavaAndroid();
+		 encodeJavaAndroid();
 
 		// encodeJavaAndroid();
 		/*
@@ -292,35 +292,37 @@ public class ByteEncodeUtil {
 			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookQQ312to300.java";
 			 * list.add(temp);
 			 */
-		}else if (5==5) {//机器人加密 
-			
-//			enableNewEncrypt = true;
-//			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstans.java";
-			sConstantClassPath =  "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
-			temp="F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\business\\RobotContentProvider.java";
+		} else if (5 == 5) {// 机器人加密
+
+			enableNewEncrypt = true;
+			sConstantsClass = "EncryptConstants";
+			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
+			// sConstantClassPath =
+			// "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
+			temp = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
 			list.add(temp);
-		/*	temp="F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
-			list.add(temp);*/
-			
-		
-		}else if (5==51) {//共同qita微信常量修复qssq6666根目录文件夹
-			
+			/*
+			 * temp=
+			 * "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
+			 * list.add(temp);
+			 */
+
+		} else if (5 == 51) {// 共同qita微信常量修复qssq6666根目录文件夹
+
 			enableNewEncrypt = true;
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
-			temp = 	"F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666";
+			temp = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666";
 			list.add(temp);
-			
-			
-		
-		}  else if (88==818) {//共同特性包名加密分享
-			
+
+		} else if (88 == 818) {// 共同特性包名加密分享
+
 			enableNewEncrypt = true;
-			sConstantClassPath=    "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\TempConstant.java";
-			sConstantsClass="TempConstant";
+			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\TempConstant.java";
+			sConstantsClass = "TempConstant";
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666";
 			list.add(temp);
-			
-		}else if (12 == 121) {//加密内置Q文件夹
+
+		} else if (12 == 121) {// 加密内置Q文件夹
 			enableNewEncrypt = true;
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\ConstantValue.java";
 			sConstantsClass = "ConstantValue";
@@ -489,6 +491,7 @@ public class ByteEncodeUtil {
 		temp = temp.replaceAll("【", "zhongz");
 		temp = temp.replaceAll("//>", "right_arr_");
 		temp = temp.replaceAll("】", "zhongr");
+		temp = temp.replaceAll("：", "");
 		temp = temp.replaceAll("‘", "_yiyuyan_");// 易语言注释一样奇葩
 		temp = temp.replaceAll("。", "_pointZ_");// 易语言注释一样奇葩
 		temp = temp.replaceAll("……", "_sheng_");// 省略号
@@ -822,7 +825,7 @@ public class ByteEncodeUtil {
 							if (debug) {
 								System.out.println("varName[" + temp + "]解密结果:" + decodeResult);
 							}
-							sDecodeMap.put(temp, decodeResult);//sDecodeMap
+							sDecodeMap.put(temp, decodeResult);// sDecodeMap
 							if (needReplace) {
 								lineTxt = "////" + sIGNORE_DECODE + lineTxt;// 不进行删除而是进行注释
 							}
