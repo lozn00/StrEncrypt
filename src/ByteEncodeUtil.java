@@ -56,7 +56,14 @@ public class ByteEncodeUtil {
 	public static boolean printSmallCode = false;
 	public static boolean printChar = true;
 	static boolean debug = false;
-	public static final String decodeMethodName = "EncryptUtil.decode";
+	/**
+	 * 加密的工具class简称
+	 */
+	public static final String decodSimpleClass = "EncryptUtil";
+	/**
+	 * 加密工具里面的解密方法
+	 */
+	public static final String decodeMethodName = decodSimpleClass + ".decode";
 
 	/*
 	 * "\"(.*?)\""
@@ -65,13 +72,21 @@ public class ByteEncodeUtil {
 
 	private final static String sBrSign = "brbr";
 
+	enum ENCRYPTTYPE {
+		QQ, WECHAT, PLUGIN, PUBLIC_FOLDER, ROBOT, OTHER
+
+	}
+
+	public static ENCRYPTTYPE encryptType = ENCRYPTTYPE.QQ;
+
 	public static void main(String[] args) {
 		String lineText = "开始\n结束 如果还是换行了说明替换失败";
 		lineText = lineText.replaceAll("\n", sBrSign);
 		System.out.println("解析后替换变量结果" + lineText);
 		debug = true;
-//		decodeJavaAndroid();
-		 encodeJavaAndroid();
+		// decodeJavaAndroid();
+		encodeJavaAndroid();
+		getFileArrayList();
 
 		// encodeJavaAndroid();
 		/*
@@ -268,7 +283,7 @@ public class ByteEncodeUtil {
 	private static ArrayList<String> getFileArrayList() {
 		String temp = "";
 		ArrayList<String> list = new ArrayList<String>();
-		if (8 == 81) {// 加密情插件
+		if (encryptType == ENCRYPTTYPE.PLUGIN) {// 加密情插件
 			sConstantsClass = "Constants";
 			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\Constants.java";
 			enableNewEncrypt = true;
@@ -292,7 +307,7 @@ public class ByteEncodeUtil {
 			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookQQ312to300.java";
 			 * list.add(temp);
 			 */
-		} else if (5 == 5) {// 机器人加密
+		} else if (encryptType == ENCRYPTTYPE.ROBOT) {// 机器人加密
 
 			enableNewEncrypt = true;
 			sConstantsClass = "EncryptConstants";
@@ -307,14 +322,14 @@ public class ByteEncodeUtil {
 			 * list.add(temp);
 			 */
 
-		} else if (5 == 51) {// 共同qita微信常量修复qssq6666根目录文件夹
+		} else if (11 == 1133) {// 共同qita微信常量修复qssq6666根目录文件夹
 
 			enableNewEncrypt = true;
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
 			temp = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666";
 			list.add(temp);
 
-		} else if (88 == 818) {// 共同特性包名加密分享
+		} else if (encryptType == ENCRYPTTYPE.PUBLIC_FOLDER) {// 共同特性包名加密分享
 
 			enableNewEncrypt = true;
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\TempConstant.java";
@@ -322,8 +337,9 @@ public class ByteEncodeUtil {
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666";
 			list.add(temp);
 
-		} else if (12 == 121) {// 加密内置Q文件夹
+		} else if (encryptType == ENCRYPTTYPE.QQ) {// 加密内置Q文件夹
 			enableNewEncrypt = true;
+			encryptAtPackage = "cn.qssq666";
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\ConstantValue.java";
 			sConstantsClass = "ConstantValue";
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard";
@@ -336,7 +352,7 @@ public class ByteEncodeUtil {
 			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\NetQuery.java";
 			 * list.add(temp);
 			 */
-		} else if (99 == 919) {// 插入微信Sscon加密 文件夹批量
+		} else if (encryptType == ENCRYPTTYPE.WECHAT) {// 插入微信Sscon加密 文件夹批量
 			enableNewEncrypt = true;
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard";
@@ -656,7 +672,7 @@ public class ByteEncodeUtil {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		return insertFieldAtClassAfter(vardeclareJava, varNameSb.toString());
+		return insertFieldAtConstantClassAfter(vardeclareJava, varNameSb.toString());
 	}
 
 	private static void loopEncryptEncodeConstant(File[] filePath, String patternString, StringBuffer varNameSb,
@@ -968,7 +984,7 @@ public class ByteEncodeUtil {
 		return info;
 	}
 
-	public static OperaInfo readTxtFileEncode(String filePath, String className) {
+	public static OperaInfo readTxtFileEncode(String filePath, String simpleClassName) {
 		OperaInfo info = new OperaInfo();
 		int dowhileCount = 0;
 		int ignoreCount = 0;
@@ -1070,31 +1086,104 @@ public class ByteEncodeUtil {
 
 		}
 		info.setMessage("忽略总数" + ignoreCount + ",进行加密的总数:" + dowhileCount + ",其中有" + existVarCount + "个常量重复,被共用");
-		info.setDoWhileResultText(sb.toString());
+		// 处理没有EncryptUtils导入的情况。这样会影响编译速度批量处理的时候比较麻烦.
+		if (!isExistImportEncryptUtilPackage(sb.toString())) {
+			info.setDoWhileResultText(insertFieldAtClassBefore(simpleClassName,sb.toString(), getEncryptImportWordByPackageName()));
+		} else {
+			info.setDoWhileResultText(sb.toString());
+		}
+
 		return info;
 	}
 
 	/**
-	 * * 插入 一段 字符串到指定文本的 class之后的成员变量
+	 * 
+	 * @return
+	 */
+	public static String getImportWordByPackageName(String packageName) {
+		return "import " + packageName;
+	}
+
+	public static String getEncryptImportWordByPackageName() {
+		return getImportWordByPackageName(encryptAtPackage + "." + decodSimpleClass);
+	}
+
+	/**
+	 * 如果没有定义也会返回 已经存在 了。
+	 * 
+	 * @param packageName
+	 *            完整包名
+	 * @param content
+	 * @return
+	 */
+	public static boolean isExistImportPackage(String packageName, String content) {
+		if (encryptAtPackage == null || content.contains("import " + packageName)) {
+			return true;
+		} else {// cn.qssq666.EncryptUtil
+			return false;
+		}
+	}
+
+	public static boolean isExistImportEncryptUtilPackage(String content) {
+		return isExistImportPackage(encryptAtPackage + "." + decodSimpleClass, content);
+	}
+
+	/**
+	 * * 插入 一段 字符串到指定文本的 class之后的成员变量 可以用于
 	 * 
 	 * @param className
 	 * @param javaSrcFileContent
 	 * @param insertContent
 	 * @return
 	 */
-	public static String insertFieldAtClassAfter(String javaSrcFileContent, String insertContent) {
+	public static String insertFieldAtClassAfter(String simpleClassName,String javaSrcFileContent, String insertContent) {
 		// TODO Auto-generated method stub
 
 		StringBuffer s1 = new StringBuffer(javaSrcFileContent); // 原字符串
 
-		String match = ".*?\\s*class " + sConstantsClass + ".*?\\{";
+		String match = ".*?\\s*class " + simpleClassName + ".*?\\{";
 		Pattern p = Pattern.compile(match); // 插入位置
 		Matcher m = p.matcher(s1.toString());
 		if (m.find()) {
 			s1.insert((m.end() + 1), insertContent); // 插入字符串
 		} else {
-			System.err.println("无法匹配匹配无法插入,className:" + sConstantsClass + ",源文件内容:" + javaSrcFileContent);
-			throw new RuntimeException("无法匹配:" + match);
+			String errorMsg = "无法匹配匹配无法插入到class之前。,className:" + simpleClassName + ",源文件内容:" + javaSrcFileContent;
+			System.err.println(errorMsg);
+			throw new RuntimeException("无法匹配:" + errorMsg);
+		}
+
+		// System.out.println(s1.toString());
+		return s1.toString();
+	}
+	public static String insertFieldAtConstantClassAfter(String javaSrcFileContent, String insertContent) {
+		return insertFieldAtClassAfter(sConstantsClass,javaSrcFileContent, insertContent);
+	}
+
+	/**
+	 * 插入到之前
+	 * 
+	 * @param javaSrcFileContent
+	 * @param insertContent
+	 * @return
+	 */
+	public static String insertFieldAtConstantClassBefore(String javaSrcFileContent, String insertContent) {
+		return insertFieldAtClassBefore(sConstantsClass, javaSrcFileContent, insertContent);
+	}
+
+	public static String insertFieldAtClassBefore(String simpleClassName, String javaSrcFileContent,
+			String insertContent) {
+		// TODO Auto-generated method stub
+
+		StringBuffer s1 = new StringBuffer(javaSrcFileContent); // 原字符串
+
+		String match = ".*?\\s*class " + simpleClassName + ".*?\\{";
+		Pattern p = Pattern.compile(match); // 插入位置
+		Matcher m = p.matcher(s1.toString());
+		if (m.find()) {
+			s1.insert((m.start() - 1), insertContent); // 插入字符串
+		} else {
+			String errorMsg = "无法匹配匹配无法插入到class之前 可能是接口 枚举类。,className:" + simpleClassName + ",源文件内容:" + javaSrcFileContent;
+			System.err.println(errorMsg);
 		}
 
 		// System.out.println(s1.toString());
@@ -1354,6 +1443,10 @@ public class ByteEncodeUtil {
 	public static boolean encryptStaticConstants = true;
 	public static boolean enteBlockComment = false;
 	public static boolean enteIgnoreBlock = false;
+	/**
+	 * 加密Utils所在包名
+	 */
+	public static String encryptAtPackage = "";
 
 	public static class OperaInfo {
 		OperaInfo() {
