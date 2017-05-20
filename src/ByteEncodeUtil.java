@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
@@ -84,8 +85,8 @@ public class ByteEncodeUtil {
 		lineText = lineText.replaceAll("\n", sBrSign);
 		System.out.println("解析后替换变量结果" + lineText);
 		debug = true;
-//		 decodeJavaAndroid();
-		encodeJavaAndroid();
+//		decodeJavaAndroid();
+		 encodeJavaAndroid();
 		getFileArrayList();
 
 		// encodeJavaAndroid();
@@ -834,6 +835,9 @@ public class ByteEncodeUtil {
 							System.err.println("解析忽略忽略行：" + lineTxt);
 							continue;
 						}
+						if (lineTxt == null || lineTxt.equals("")) {
+							continue;
+						}
 						Pattern patternVarName = Pattern.compile(encodeLineReg);
 						Matcher matcher = patternVarName.matcher(lineTxt);
 
@@ -1089,9 +1093,11 @@ public class ByteEncodeUtil {
 		info.setMessage("忽略总数" + ignoreCount + ",进行加密的总数:" + dowhileCount + ",其中有" + existVarCount + "个常量重复,被共用");
 		// 处理没有EncryptUtils导入的情况。这样会影响编译速度批量处理的时候比较麻烦.
 		if (!isExistImportEncryptUtilPackage(sb.toString())) {
-			info.setDoWhileResultText(insertPackAage(simpleClassName, sb.toString(), getEncryptImportWordByPackageName()));
-			//既然是包名   就饿没必要这么插入直接插入到顶部也许。
-//			info.setDoWhileResultText(insertFieldAtClassBefore(simpleClassName,sb.toString(), getEncryptImportWordByPackageName()));
+			info.setDoWhileResultText(
+					insertPackAage(simpleClassName, sb.toString(), getEncryptImportWordByPackageName()));
+			// 既然是包名 就饿没必要这么插入直接插入到顶部也许。
+			// info.setDoWhileResultText(insertFieldAtClassBefore(simpleClassName,sb.toString(),
+			// getEncryptImportWordByPackageName()));
 		} else {
 			info.setDoWhileResultText(sb.toString());
 		}
@@ -1104,7 +1110,7 @@ public class ByteEncodeUtil {
 	 * @return
 	 */
 	public static String getImportWordByPackageName(String packageName) {
-		return "import " + packageName+";";
+		return "import " + packageName + ";";
 	}
 
 	public static String getEncryptImportWordByPackageName() {
@@ -1128,7 +1134,7 @@ public class ByteEncodeUtil {
 	}
 
 	public static boolean isExistImportEncryptUtilPackage(String content) {
-		return encryptAtPackage==null ||isExistImportPackage(encryptAtPackage + "." + decodSimpleClass, content);
+		return encryptAtPackage == null || isExistImportPackage(encryptAtPackage + "." + decodSimpleClass, content);
 	}
 
 	/**
@@ -1139,7 +1145,8 @@ public class ByteEncodeUtil {
 	 * @param insertContent
 	 * @return
 	 */
-	public static String insertFieldAtClassAfter(String simpleClassName,String javaSrcFileContent, String insertContent) {
+	public static String insertFieldAtClassAfter(String simpleClassName, String javaSrcFileContent,
+			String insertContent) {
 		// TODO Auto-generated method stub
 
 		StringBuffer s1 = new StringBuffer(javaSrcFileContent); // 原字符串
@@ -1158,8 +1165,9 @@ public class ByteEncodeUtil {
 		// System.out.println(s1.toString());
 		return s1.toString();
 	}
+
 	public static String insertFieldAtConstantClassAfter(String javaSrcFileContent, String insertContent) {
-		return insertFieldAtClassAfter(sConstantsClass,javaSrcFileContent, insertContent);
+		return insertFieldAtClassAfter(sConstantsClass, javaSrcFileContent, insertContent);
 	}
 
 	/**
@@ -1185,23 +1193,25 @@ public class ByteEncodeUtil {
 		if (m.find()) {
 			s1.insert((m.start() - 1), insertContent); // 插入字符串
 		} else {
-			String errorMsg = "无法匹配匹配无法插入到class之前 可能是接口 枚举类。,className:" + simpleClassName + ",源文件内容:" + javaSrcFileContent;
+			String errorMsg = "无法匹配匹配无法插入到class之前 可能是接口 枚举类。,className:" + simpleClassName + ",源文件内容:"
+					+ javaSrcFileContent;
 			System.err.println(errorMsg);
 		}
 
 		// System.out.println(s1.toString());
 		return s1.toString();
 	}
-	
+
 	/**
 	 * 第一行是导入包 个关键字 所以要忽略.
-	 * @param simpleClassName 这里没有用上
+	 * 
+	 * @param simpleClassName
+	 *            这里没有用上
 	 * @param javaSrcFileContent
 	 * @param insertContent
 	 * @return
 	 */
-	public static String insertPackAage(String simpleClassName, String javaSrcFileContent,
-			String insertContent) {
+	public static String insertPackAage(String simpleClassName, String javaSrcFileContent, String insertContent) {
 		// TODO Auto-generated method stub
 
 		StringBuffer s1 = new StringBuffer(javaSrcFileContent); // 原字符串
@@ -1210,7 +1220,7 @@ public class ByteEncodeUtil {
 		Pattern p = Pattern.compile(match); // 插入位置
 		Matcher m = p.matcher(s1.toString());
 		if (m.find()) {
-			s1.insert((m.end() +1), insertContent); // 插入字符串
+			s1.insert((m.end() + 1), insertContent); // 插入字符串
 		} else {
 			String errorMsg = "无法插入包名到第二行。,className:" + simpleClassName + ",源文件内容:" + javaSrcFileContent;
 			System.err.println(errorMsg);
@@ -1219,7 +1229,6 @@ public class ByteEncodeUtil {
 		// System.out.println(s1.toString());
 		return s1.toString();
 	}
-	
 
 	private static String readString2(String strPath)
 
@@ -1301,7 +1310,16 @@ public class ByteEncodeUtil {
 		if (enableNewEncrypt) {
 			char[] chars = new char[arr.length - 1];
 			String temp = arr[0].replace(" ", "");
-			int decyprtValue = Integer.valueOf(temp);
+			int decyprtValue;
+			try {
+				if (temp == null || temp.equals("")) {
+					return "";
+				}
+				decyprtValue = Integer.valueOf(temp);
+			} catch (Exception e) {
+				throw new RuntimeException("错误原因:" + e.getMessage() + ",arr:" + Arrays.toString(arr));
+			}
+
 			for (int i = 1; i < arr.length; i++) {
 				arr[i] = arr[i].replace(" ", "");
 				int tempInt = Integer.parseInt(arr[i]);
@@ -1324,6 +1342,7 @@ public class ByteEncodeUtil {
 	}
 
 	public static boolean enableNewEncrypt = false;
+	private static int maxArrLength=140;
 
 	public static int getEncodeIntValue(int value, int encryptValue) {
 		if (enableNewEncrypt) {
@@ -1352,7 +1371,7 @@ public class ByteEncodeUtil {
 				System.err.println("进行编码加密brbr转换为换行符,转换结果:" + str);
 			}
 		}
-		return getIntSvARValue(charArrayToEncodeIntArray(str.toCharArray()));
+		return getIntSvARValue(charArrayToEncodeIntArray(str.toCharArray()),str);
 	}
 
 	/**
@@ -1361,8 +1380,12 @@ public class ByteEncodeUtil {
 	 * @param ints
 	 * @return
 	 */
-	public static String getIntSvARValue(int[] ints) {
+	public static String getIntSvARValue(int[] ints,String str) {
 		char[] chars = new char[ints.length];
+		if (chars.length > maxArrLength) {
+			throw new RuntimeException("无法处理加密数组 数组过长，最多"+maxArrLength+"个数组，请适当切割字符串,数组太长会导致报错【Error:(34, 29) 错误: 代码过长 】异常数组长度"
+					+ ints.length + ",值:"+str);
+		}
 		StringBuilder sbChars = new StringBuilder();
 		sbChars.append("new int[]{");
 		for (int i = 0; i < ints.length; i++) {
