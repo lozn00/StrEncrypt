@@ -84,7 +84,7 @@ public class ByteEncodeUtil {
 		lineText = lineText.replaceAll("\n", sBrSign);
 		System.out.println("解析后替换变量结果" + lineText);
 		debug = true;
-		// decodeJavaAndroid();
+//		 decodeJavaAndroid();
 		encodeJavaAndroid();
 		getFileArrayList();
 
@@ -354,6 +354,7 @@ public class ByteEncodeUtil {
 			 */
 		} else if (encryptType == ENCRYPTTYPE.WECHAT) {// 插入微信Sscon加密 文件夹批量
 			enableNewEncrypt = true;
+			encryptAtPackage = "cn.qssq666";
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard";
 			// temp =
@@ -1088,7 +1089,9 @@ public class ByteEncodeUtil {
 		info.setMessage("忽略总数" + ignoreCount + ",进行加密的总数:" + dowhileCount + ",其中有" + existVarCount + "个常量重复,被共用");
 		// 处理没有EncryptUtils导入的情况。这样会影响编译速度批量处理的时候比较麻烦.
 		if (!isExistImportEncryptUtilPackage(sb.toString())) {
-			info.setDoWhileResultText(insertFieldAtClassBefore(simpleClassName,sb.toString(), getEncryptImportWordByPackageName()));
+			info.setDoWhileResultText(insertPackAage(simpleClassName, sb.toString(), getEncryptImportWordByPackageName()));
+			//既然是包名   就饿没必要这么插入直接插入到顶部也许。
+//			info.setDoWhileResultText(insertFieldAtClassBefore(simpleClassName,sb.toString(), getEncryptImportWordByPackageName()));
 		} else {
 			info.setDoWhileResultText(sb.toString());
 		}
@@ -1101,7 +1104,7 @@ public class ByteEncodeUtil {
 	 * @return
 	 */
 	public static String getImportWordByPackageName(String packageName) {
-		return "import " + packageName;
+		return "import " + packageName+";";
 	}
 
 	public static String getEncryptImportWordByPackageName() {
@@ -1117,7 +1120,7 @@ public class ByteEncodeUtil {
 	 * @return
 	 */
 	public static boolean isExistImportPackage(String packageName, String content) {
-		if (encryptAtPackage == null || content.contains("import " + packageName)) {
+		if (content.contains("import " + packageName)) {
 			return true;
 		} else {// cn.qssq666.EncryptUtil
 			return false;
@@ -1125,7 +1128,7 @@ public class ByteEncodeUtil {
 	}
 
 	public static boolean isExistImportEncryptUtilPackage(String content) {
-		return isExistImportPackage(encryptAtPackage + "." + decodSimpleClass, content);
+		return encryptAtPackage==null ||isExistImportPackage(encryptAtPackage + "." + decodSimpleClass, content);
 	}
 
 	/**
@@ -1189,6 +1192,34 @@ public class ByteEncodeUtil {
 		// System.out.println(s1.toString());
 		return s1.toString();
 	}
+	
+	/**
+	 * 第一行是导入包 个关键字 所以要忽略.
+	 * @param simpleClassName 这里没有用上
+	 * @param javaSrcFileContent
+	 * @param insertContent
+	 * @return
+	 */
+	public static String insertPackAage(String simpleClassName, String javaSrcFileContent,
+			String insertContent) {
+		// TODO Auto-generated method stub
+
+		StringBuffer s1 = new StringBuffer(javaSrcFileContent); // 原字符串
+
+		String match = ".*?\\s*package.*?;";
+		Pattern p = Pattern.compile(match); // 插入位置
+		Matcher m = p.matcher(s1.toString());
+		if (m.find()) {
+			s1.insert((m.end() +1), insertContent); // 插入字符串
+		} else {
+			String errorMsg = "无法插入包名到第二行。,className:" + simpleClassName + ",源文件内容:" + javaSrcFileContent;
+			System.err.println(errorMsg);
+		}
+
+		// System.out.println(s1.toString());
+		return s1.toString();
+	}
+	
 
 	private static String readString2(String strPath)
 
