@@ -21,7 +21,7 @@ import org.apache.commons.io.FilenameUtils;
 
 public class ByteEncodeUtil {
 	/**
-	 * 更换加密方式的时候应该把原来储存的常量删除，否则导致还是原来的加密
+	 * 更换加密方式的时候应该把原来储存的常量删除，否则导致还是原来的加密 这里也许不应该用hash，这里只需要判断是否已经加密了而已
 	 */
 	static HashMap<String, String> sEncodeMap = new HashMap<>();
 	public static String sConstantsClass = "ConstantValue";
@@ -64,11 +64,11 @@ public class ByteEncodeUtil {
 	/**
 	 * 加密的工具class简称
 	 */
-	public static String decodSimpleClass = "EncryptUtil";
+	public static String sDecodSimpleClass = "EncryptUtil";
 	/**
 	 * 加密工具里面的解密方法
 	 */
-	public static String decodeMethodName = decodSimpleClass + ".decode";
+	public static String decodeMethodName = sDecodSimpleClass + ".decode";
 
 	/*
 	 * "\"(.*?)\""
@@ -77,6 +77,7 @@ public class ByteEncodeUtil {
 		return ".*?" + decodeMethodName + "\\((.*?)\\)" + ".*?";
 	}
 
+	// TODO 有待添加常量导包功能
 	private final static String sBrSign = "brbr";
 
 	enum MODULEETYPE {
@@ -93,15 +94,29 @@ public class ByteEncodeUtil {
 	 */
 	static EncryptType currentEncryptType = EncryptType.NEWENCRYPT;
 
-	public static MODULEETYPE moduleType = MODULEETYPE.CRACK_SIGN;
+	public static MODULEETYPE moduleType = MODULEETYPE.ROBOT;
+	private static Object constantsAtPackage;
+
+	public static String escapeStr(String str) {
+		str = str.replaceAll("\\\\n", String.valueOf(new char[] { 10 }));
+		str = str.replaceAll("\\\\b", "\b");
+		str = str.replaceAll("\\\\t", "\t");
+		str = str.replaceAll("\\n", String.valueOf(new char[] { 10 }));
+		str = str.replaceAll("\\\\r", String.valueOf(new char[] { 13 }));
+		str = str.replaceAll("\\r", String.valueOf(new char[] { 13 }));
+		// str = str.replaceAll("\n", String.valueOf(new char[]{10}));
+		// str = str.replaceAll("\r", String.valueOf(new char[]{13}));
+		return str;
+	}
 
 	public static void main(String[] args) {
-		String lineText = "开始\n结束 如果还是换行了说明替换失败";
-		lineText = lineText.replaceAll("\n", sBrSign);
+		String lineText = "开始\n结束 如果还是换行了说明替换失败\b \b \b \t \t \r\n  多重转义\\n \\r";
+
 		System.out.println("解析后替换变量结果" + lineText);
+		System.out.println("解析后替换变量结果" + escapeStr(lineText));
 		debug = true;
-//		 decodeJavaAndroid();
-		encodeJavaAndroid();
+		// decodeJavaAndroid();
+		 encodeJavaAndroid();
 		getFileArrayList();
 
 		// encodeJavaAndroid();
@@ -326,13 +341,18 @@ public class ByteEncodeUtil {
 			 * list.add(temp);
 			 */
 		} else if (moduleType == MODULEETYPE.ROBOT) {// 机器人加密
+			encryptAtPackage = "cn.qssq666";
 
 			currentEncryptType = EncryptType.NEWENCRYPT;
+			constantsAtPackage = "cn.qssq666.robot.constants";
 			sConstantsClass = "EncryptConstants";
+			useVarQuote = false;
 			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
 			// sConstantClassPath =
 			// "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
-			temp = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
+			temp = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\MainActivity.java";
+			// temp =
+			// "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
 			list.add(temp);
 			/*
 			 * temp=
@@ -403,7 +423,7 @@ public class ByteEncodeUtil {
 			sConstantClassPath = null;
 			sConstantsClass = null;
 
-			decodSimpleClass = "QSSQUtils";
+			sDecodSimpleClass = "QSSQUtils";
 			decodeMethodName = "QSSQUtils.qssq";
 			// encryptConfig.setAllowConstantsEmpty(true);//本来就没解密这个东西都不应该有
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\statistics\\ufo";
@@ -415,7 +435,7 @@ public class ByteEncodeUtil {
 			debug = true;
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\ui\\base\\fw.java";
 			sConstantsClass = "fw";
-			decodSimpleClass = "fw";
+			sDecodSimpleClass = "fw";
 			decodeMethodName = "fw.sss";
 			// encryptConfig.setAllowConstantsEmpty(true);//本来就没解密这个东西都不应该有
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\ui\\base\\fw.java";
@@ -786,7 +806,7 @@ public class ByteEncodeUtil {
 								String baseVar = getVarBaseName(temp, isChinese);
 								if (!sEncodeMap.containsKey(baseVar)) {
 									if (sDecodeMap.containsKey(baseVar)) {
-										sEncodeMap.put(baseVar, "");
+										sEncodeMap.put(baseVar, "");// 只是用来放置一个东西来判断是否已经加密了，但是实际上加密了啥东西不需要关注所以为空
 										if (debug) {
 											System.err.println("解码常量表已定义变量:" + baseVar + ",line:" + temp);
 										}
@@ -798,7 +818,7 @@ public class ByteEncodeUtil {
 									 * 下面这句话实现变量申明字符串
 									 */
 									// 生成
-									varNameSb.append(getVarName(baseVar) + stringToCharCodeJava(temp) + ";//content="
+									varNameSb.append(getVarName(baseVar) + stringToCharCodeJava(temp) + ";//content="// 真正的加密逻辑在这里
 											+ temp + "\n\n");
 									if (debug) {
 										System.out.println("创建字段:" + baseVar + ",value:" + temp);
@@ -847,7 +867,7 @@ public class ByteEncodeUtil {
 	}
 
 	/**
-	 * 加载加密字段并进行解密处理 存放到集合中 如果需要替换则会返回替换,进行屏蔽处理之后的文本
+	 * 加载加密字段并进行解密处理 存放到集合中 如果需要替换则会返回替换,进行屏蔽处理之后的文本 这样做可以减少加密工作已经加密的合并到一起。
 	 * 
 	 * @param filePath
 	 * @param className
@@ -1010,7 +1030,8 @@ public class ByteEncodeUtil {
 
 								decodeCount++;
 								lineTxt = lineTxt.replace(decodeMethodName + "(" + temp + ")", "\"" + value + "\"");// 对函数进行替换
-								lineTxt = lineTxt.replaceAll("\n", sBrSign);// 处理里的字符串。
+								// lineTxt = lineTxt.replaceAll("\n",
+								// sBrSign);// 处理里的字符串。
 
 								if (lineTxt.indexOf("\n") != -1) {
 									System.err.println("无法替换\n还是存在");
@@ -1040,7 +1061,7 @@ public class ByteEncodeUtil {
 		} catch (Exception e) {
 			System.out.println("读取文件内容出错");
 			e.printStackTrace();
-			throw new RuntimeException("文件文件" + filePath+"  ,"+ e);
+			throw new RuntimeException("文件文件" + filePath + "  ," + e);
 		}
 		/*
 		 * if (true) { throw new RuntimeException("等待处理");
@@ -1082,7 +1103,7 @@ public class ByteEncodeUtil {
 
 	private static boolean isIntArr(String str) {
 		boolean result;
-		if (str == null || (sConstantsClass!=null &&str.startsWith((sConstantsClass)))) {
+		if (str == null || (sConstantsClass != null && str.startsWith((sConstantsClass)))) {
 
 			result = false;
 		} else {
@@ -1227,18 +1248,20 @@ public class ByteEncodeUtil {
 		}
 		info.setMessage("忽略总数" + ignoreCount + ",进行加密的总数:" + dowhileCount + ",其中有" + existVarCount + "个常量重复,被共用");
 		// 处理没有EncryptUtils导入的情况。这样会影响编译速度批量处理的时候比较麻烦.
-		if (!
 
-		isExistImportEncryptUtilPackage(sb.toString())) {
-			info.setDoWhileResultText(
-					insertPackAage(simpleClassName, sb.toString(), getEncryptImportWordByPackageName()));
-			// 既然是包名 就饿没必要这么插入直接插入到顶部也许。
-			// info.setDoWhileResultText(insertFieldAtClassBefore(simpleClassName,sb.toString(),
-			// getEncryptImportWordByPackageName()));
-		} else {
-			info.setDoWhileResultText(sb.toString());
+		String result = sb.toString();
+		if (!isExistImportEncryptUtilPackage(result)) {
+			result = insertPackAage(simpleClassName, result, getEncryptImportWordByPackageName());
+		}
+		if (!isExistImportConstantPackage(result)) {
+			result = insertPackAage(simpleClassName, result, getConstantsImportWordByPackageName());
 		}
 
+		if (result == null) {
+			result = sb.toString();
+		}
+
+		info.setDoWhileResultText(result);
 		return info;
 	}
 
@@ -1251,7 +1274,11 @@ public class ByteEncodeUtil {
 	}
 
 	public static String getEncryptImportWordByPackageName() {
-		return getImportWordByPackageName(encryptAtPackage + "." + decodSimpleClass);
+		return getImportWordByPackageName(encryptAtPackage + "." + sDecodSimpleClass);
+	}
+
+	public static String getConstantsImportWordByPackageName() {
+		return getImportWordByPackageName(constantsAtPackage + "." + sConstantsClass);
 	}
 
 	/**
@@ -1272,7 +1299,12 @@ public class ByteEncodeUtil {
 
 	public static boolean isExistImportEncryptUtilPackage(String content) {
 		return encryptAtPackage == null || encryptAtPackage == ""
-				|| isExistImportPackage(encryptAtPackage + "." + decodSimpleClass, content);
+				|| isExistImportPackage(encryptAtPackage + "." + sDecodSimpleClass, content);
+	}
+
+	public static boolean isExistImportConstantPackage(String content) {
+		return constantsAtPackage == null || constantsAtPackage == ""
+				|| isExistImportPackage(constantsAtPackage + "." + sConstantsClass, content);
 	}
 
 	/**
@@ -1475,6 +1507,9 @@ public class ByteEncodeUtil {
 				chars[i - 1] = (char) tempInt;
 			}
 			String decodeResult = String.valueOf(chars);
+			if (decodeResult != null) {
+				decodeResult = decodeResult.replaceAll("\\\\n", "\n");
+			}
 			return decodeResult;
 		} else if (currentEncryptType == EncryptType.OTHERENCRYPT) {// 不进行与运算
 			char[] chars = new char[arr.length];
@@ -1507,6 +1542,17 @@ public class ByteEncodeUtil {
 		return value;// 移除代价再与运算
 	}
 
+	public static String escapeExprSpecialWord(String keyword) {
+		String[] fbsArr = { "\\", "$", "(", ")", "*", "+", ".", "[", "]", "?", "^", "{", "}", "|" };
+		for (String key : fbsArr) {
+			if (keyword.contains(key)) {
+				keyword = keyword.replace(key, "\\" + key);
+			}
+		}
+
+		return keyword;
+	}
+
 	// private int[] a=new int[];
 	/**
 	 * 字符串转int[]数组 字符串java 返回的是 new int[] { }
@@ -1523,6 +1569,27 @@ public class ByteEncodeUtil {
 				System.err.println("进行编码加密brbr转换为换行符,转换结果:" + str);
 			}
 		}
+
+		/*
+		 * if (str.indexOf("\n") != -1) { str = str.replaceAll("\n",
+		 * String.valueOf(new char[]{10}));// 处理特殊符号转义 如果直接\n那么会读入多行不是吗？ if
+		 * (debug) { System.err.println("进行编码加密换行转,转换结果:" + str); } }
+		 */
+		str = escapeStr(str);
+		/*
+		 * if (str.indexOf("\\n") != -1) { str = str.replaceAll("\\n",
+		 * String.valueOf(new char[]{10}));// 处理特殊符号转义 如果直接\n那么会读入多行不是吗？ if
+		 * (debug) { System.err.println("进行编码加密换行转,转换结果:" + str); } }
+		 * 
+		 * 
+		 * if(str.contains("\\")){ str = str.replaceAll("\\", String.valueOf(new
+		 * char[]{92}));// 处理特殊符号转义 如果直接\n那么会读入多行不是吗？ if(debug){
+		 * System.out.println("包含特殊转义\\字符正在处理 当前包含特殊字符的是:"+str); } }
+		 * if(str.contains("\\\\")){ str = str.replaceAll("\\\\", "\\");//
+		 * 处理特殊符号转义 如果直接\n那么会读入多行不是吗？ if(debug){ System.out.println(
+		 * "包含特殊转义\\\\字符正在处理 当前包含特殊字符的是:"+str); } }
+		 */
+		// System.err.println("正在加密中。。。处理当前行转义:" + str);
 		return getIntSvARValue(charArrayToEncodeIntArray(str.toCharArray()), str);
 	}
 
@@ -1565,14 +1632,24 @@ public class ByteEncodeUtil {
 	 * @return
 	 */
 	static boolean isIgNoreDecodeText(String text, boolean isdecodeConstants) {// 对于静态的首先对于jni要处理加载顺序问题就是一个很头疼的问题，其次
+		if (text.equals("\\n")) {
+
+			if (debug) {
+				System.err.println("忽略换行符");
+				return true;
+				// throw new RuntimeException("发现换行符" + text);
+			}
+		}
 		String temp = text.replaceAll(" ", "");
 		temp = temp.replaceAll("	", "");
+
 		if (temp.contains("ignore_exclude")) {
 			return false;// 表示必须加密的，
 		}
 		if (temp.contains("ignore_include")) {
 			return true;// 表示无需加密
 		}
+
 		if (temp.toLowerCase().contains("ignore_start") || temp.toLowerCase().contains("regoin_start")) {
 			enteIgnoreBlock = true;
 			if (debug) {
@@ -1594,6 +1671,7 @@ public class ByteEncodeUtil {
 			}
 			return true;
 		}
+
 		if (temp.startsWith("/*") && temp.indexOf("*/") != -1) {
 			if (debug) {
 				System.out.println("忽略行块注释 " + text);
