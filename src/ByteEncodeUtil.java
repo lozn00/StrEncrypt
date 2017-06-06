@@ -18,7 +18,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-
+import org.apache.commons.lang3.StringEscapeUtils;
+//TODO 下次增加自动清空常量class已经申明的变量功能。
 public class ByteEncodeUtil {
 	/**
 	 * 更换加密方式的时候应该把原来储存的常量删除，否则导致还是原来的加密 这里也许不应该用hash，这里只需要判断是否已经加密了而已
@@ -96,8 +97,12 @@ public class ByteEncodeUtil {
 
 	public static MODULEETYPE moduleType = MODULEETYPE.ROBOT;
 	private static Object constantsAtPackage;
-
-	public static String escapeStr(String str) {
+		/**
+		 * java源码是已经被转义了的进行加密的时候必须进行反转义。
+		 * @param str
+		 * @return
+		 */
+	public static String unescapeStr(String str) {
 		str = str.replaceAll("\\\\n", String.valueOf(new char[] { 10 }));
 		str = str.replaceAll("\\\\b", "\b");
 		str = str.replaceAll("\\\\t", "\t");
@@ -108,15 +113,28 @@ public class ByteEncodeUtil {
 		// str = str.replaceAll("\r", String.valueOf(new char[]{13}));
 		return str;
 	}
-
+	/**
+	 * 把被转义后的进行替换 StringEscapeUtils不靠谱 中文都转义了。 这里也需要4个 否则 只有b却没有斜杠了。
+	 * @param str
+	 * @return
+	 */
+	public static String escapeStr(String str) {
+		str = str.replaceAll("\t", "\\\\t");
+		str = str.replaceAll("\b", "\\\\b");
+		str = str.replaceAll("\n", "\\\\n");
+		str = str.replaceAll("\r", "\\\\r");
+		// str = str.replaceAll("\n", String.valueOf(new char[]{10}));
+		// str = str.replaceAll("\r", String.valueOf(new char[]{13}));
+		return str;
+	}
 	public static void main(String[] args) {
-		String lineText = "开始\n结束 如果还是换行了说明替换失败\b \b \b \t \t \r\n  多重转义\\n \\r";
-
+		String lineText = "开始\n结束 如果还是换行了说明替换失败\b \b \b \t \t \r\n  多重转义\\\\n \\\\r";
 		System.out.println("解析后替换变量结果" + lineText);
-		System.out.println("解析后替换变量结果" + escapeStr(lineText));
+		System.out.println("解析后替换变量结果" + unescapeStr(lineText));
+		
 		debug = true;
-		// decodeJavaAndroid();
-		 encodeJavaAndroid();
+		 decodeJavaAndroid();
+//		 encodeJavaAndroid();
 		getFileArrayList();
 
 		// encodeJavaAndroid();
@@ -181,6 +199,7 @@ public class ByteEncodeUtil {
 			System.out.println("加载常数组量完毕!,总数:" + sDecodeMap.size() + ",即将进行解密");
 
 		}
+	
 
 		for (int i = 0; i < arrayList.size(); i++) {
 			String file = arrayList.get(i);
@@ -346,13 +365,10 @@ public class ByteEncodeUtil {
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			constantsAtPackage = "cn.qssq666.robot.constants";
 			sConstantsClass = "EncryptConstants";
-			useVarQuote = false;
+//			useVarQuote = false;
 			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
-			// sConstantClassPath =
-			// "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
 			temp = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\MainActivity.java";
-			// temp =
-			// "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
+//			temp=  "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
 			list.add(temp);
 			/*
 			 * temp=
@@ -918,7 +934,7 @@ public class ByteEncodeUtil {
 							String temp = matcher.group(1).trim();// 获取匹配yuanzn
 							String arrsStr = matcher.group(2);// 获取匹配yuanzn
 							String[] arr = arr = arrsStr.split(",");
-							String decodeResult = getDeCodeValue(arr);
+							String decodeResult = escapeStr( getDeCodeValue(arr));//解密后变成java源码后就可以解决出现多行了特别是换行符简直惨不忍睹
 							if (debug) {
 								System.out.println("varName[" + temp + "]解密结果:" + decodeResult);
 							}
@@ -1485,7 +1501,11 @@ public class ByteEncodeUtil {
 		}
 
 	}
-
+	/**
+	 * 解密
+	 * @param arr
+	 * @return
+	 */
 	private static String getDeCodeValue(String[] arr) {
 		if (currentEncryptType == EncryptType.NEWENCRYPT) {
 			char[] chars = new char[arr.length - 1];
@@ -1575,7 +1595,7 @@ public class ByteEncodeUtil {
 		 * String.valueOf(new char[]{10}));// 处理特殊符号转义 如果直接\n那么会读入多行不是吗？ if
 		 * (debug) { System.err.println("进行编码加密换行转,转换结果:" + str); } }
 		 */
-		str = escapeStr(str);
+		str = unescapeStr(str);//java字符串需要反转义如 变成真正的换行符 
 		/*
 		 * if (str.indexOf("\\n") != -1) { str = str.replaceAll("\\n",
 		 * String.valueOf(new char[]{10}));// 处理特殊符号转义 如果直接\n那么会读入多行不是吗？ if
