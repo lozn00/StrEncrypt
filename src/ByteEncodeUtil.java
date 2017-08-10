@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+
 //TODO 下次增加自动清空常量class已经申明的变量功能。
 public class ByteEncodeUtil {
 	/**
@@ -57,11 +58,20 @@ public class ByteEncodeUtil {
 	// =".*?int\\[\\s*\\](\\s*).*?\\=.*?\\{(.*?)\\}.*?";
 	public static boolean printSmallCode = false;
 	public static boolean printChar = true;
+	/**
+	 * 默认加密模式是把字符串替换为 加密方法 加密方法传递的是加密的int数组，但是这种方法，有时候效率比较低,或者容易被hook控制模仿,
+	 */
+	public static boolean isIntArrEncryptMode = true;
 	static boolean debug = false;
 	/**
 	 * 针对加密 把所有加密的提取到一个变量数组。 或者直接 new一个匿名的。 true则使用变量引用。
 	 */
 	static boolean useVarQuote = true;
+	/**
+	 * 比如字符串 "你好"替换为Encrypt.decode(Constant.xxxx)如果为false 直接
+	 * 变成Constant.xxxx加载加密序列.
+	 */
+	static boolean useEncryptUtilWrap = true;
 	/**
 	 * 加密的工具class简称
 	 */
@@ -75,7 +85,14 @@ public class ByteEncodeUtil {
 	 * "\"(.*?)\""
 	 */
 	public static final String getDecodeMethodNameReg() {
+
 		return ".*?" + decodeMethodName + "\\((.*?)\\)" + ".*?";
+	}
+
+	public static final String getDecodConstantsNameReg() {
+		// .*?(Constants\.\w*).*? ""+Constants.xxxxdd+". 取出这个常量
+		// 这个常量的名字只能是字母大小写加数字，其他的不识别。
+		return ".*?\\(" + sConstantsClass + "\\.\\w*\\).*?";
 	}
 
 	// TODO 有待添加常量导包功能
@@ -87,7 +104,8 @@ public class ByteEncodeUtil {
 	}
 
 	public enum EncryptType {
-		NEWENCRYPT, OLDENCRYPT, OTHERENCRYPT
+		NEWENCRYPT, OLDENCRYPT, OTHERENCRYPT,
+		STR_SHOW_ENCRYPT//字符串加密类型是2017年8月10日 22:19:39 最新构思的一种加密方式，是直接显示字符串的方式，不过如果让你好123加密之后长度不会更长就是一个蛋疼的问题。
 	}
 
 	/**
@@ -95,73 +113,23 @@ public class ByteEncodeUtil {
 	 */
 	static EncryptType currentEncryptType = EncryptType.NEWENCRYPT;
 
-	public static MODULEETYPE moduleType = MODULEETYPE.ROBOT;
-	private static Object constantsAtPackage;
-		/**
-		 * java源码是已经被转义了的进行加密的时候必须进行反转义。
-		 * @param str
-		 * @return
-		 */
-	public static String unescapeStr(String str) {
-		str = str.replaceAll("\\\\n", String.valueOf(new char[] { 10 }));
-		str = str.replaceAll("\\\\b", "\b");
-		str = str.replaceAll("\\\\t", "\t");
-		str = str.replaceAll("\\n", String.valueOf(new char[] { 10 }));
-		str = str.replaceAll("\\\\r", String.valueOf(new char[] { 13 }));
-		str = str.replaceAll("\\r", String.valueOf(new char[] { 13 }));
-		// str = str.replaceAll("\n", String.valueOf(new char[]{10}));
-		// str = str.replaceAll("\r", String.valueOf(new char[]{13}));
-		return str;
-	}
+	public static MODULEETYPE moduleType = MODULEETYPE.QQ;
 	/**
-	 * 把被转义后的进行替换 StringEscapeUtils不靠谱 中文都转义了。 这里也需要4个 否则 只有b却没有斜杠了。
-	 * @param str
-	 * @return
+	 * 常量的所在包名
 	 */
-	public static String escapeStr(String str) {
-		str = str.replaceAll("\t", "\\\\t");
-		str = str.replaceAll("\b", "\\\\b");
-		str = str.replaceAll("\n", "\\\\n");
-		str = str.replaceAll("\r", "\\\\r");
-		// str = str.replaceAll("\n", String.valueOf(new char[]{10}));
-		// str = str.replaceAll("\r", String.valueOf(new char[]{13}));
-		return str;
-	}
+	private static String sConstantsAtPackage;
+
 	public static void main(String[] args) {
 		String lineText = "开始\n结束 如果还是换行了说明替换失败\b \b \b \t \t \r\n  多重转义\\\\n \\\\r";
 		System.out.println("解析后替换变量结果" + lineText);
 		System.out.println("解析后替换变量结果" + unescapeStr(lineText));
-		
+
 		debug = true;
-		 decodeJavaAndroid();
-//		 encodeJavaAndroid();
+		decodeJavaAndroid();
+		// encodeJavaAndroid();
 		getFileArrayList();
 
 		// encodeJavaAndroid();
-		/*
-		 * 
-		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
-		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
-		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
-		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
-		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
-		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
-		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
-		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
-		 * System.out.println(Math.abs(new Random().nextInt(6)));// 0 1 2 0 1 2
-		 *
-		 */
-		// testAtest();
-		// System.out.println(getVarBaseName("+}|{\"P:>?<8764%￥@￥.#$%&!@#$^&*()_",
-		// false));
-		// System.out.println(getVarBaseName("~·！@#￥%……&*（）——+=-【】、‘；、。，",
-		// false));
-		// System.out.println(getVarBaseName("test.#$%&!@#$^&*()_", false));
-		// doEncodeAllJava("F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\tui\\fw.java");
-		// doEncodeAllJava("src/fw.txt");
-		// String file =
-		// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\tui\\qqplugin.java";
-		// debug=true;
 		/**
 		 * 对于换行符用brbr处理
 		 */
@@ -189,6 +157,42 @@ public class ByteEncodeUtil {
 
 	}
 
+	/**
+	 * java源码是已经被转义了的进行加密的时候必须进行反转义。
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static String unescapeStr(String str) {
+		str = str.replaceAll("\\\\n", String.valueOf(new char[] { 10 }));
+		str = str.replaceAll("\\\\b", "\b");
+		str = str.replaceAll("\\@", "@");
+		str = str.replaceAll("\\\\t", "\t");
+		str = str.replaceAll("\\n", String.valueOf(new char[] { 10 }));
+		str = str.replaceAll("\\\\r", String.valueOf(new char[] { 13 }));
+		str = str.replaceAll("\\r", String.valueOf(new char[] { 13 }));
+		// str = str.replaceAll("\n", String.valueOf(new char[]{10}));
+		// str = str.replaceAll("\r", String.valueOf(new char[]{13}));
+		return str;
+	}
+
+	/**
+	 * 把被转义后的进行替换 StringEscapeUtils不靠谱 中文都转义了。 这里也需要4个 否则 只有b却没有斜杠了。
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static String escapeStr(String str) {
+		str = str.replaceAll("@", "\\@");// 我猜测字符转义的是2个斜杠而其他则不是。
+		str = str.replaceAll("\t", "\\\\t");
+		str = str.replaceAll("\b", "\\\\b");
+		str = str.replaceAll("\n", "\\\\n");
+		str = str.replaceAll("\r", "\\\\r");
+		// str = str.replaceAll("\n", String.valueOf(new char[]{10}));
+		// str = str.replaceAll("\r", String.valueOf(new char[]{13}));
+		return str;
+	}
+
 	private static void decodeJavaAndroid() {
 		ArrayList<String> arrayList = getFileArrayList();
 		if (debug) {
@@ -199,7 +203,6 @@ public class ByteEncodeUtil {
 			System.out.println("加载常数组量完毕!,总数:" + sDecodeMap.size() + ",即将进行解密");
 
 		}
-	
 
 		for (int i = 0; i < arrayList.size(); i++) {
 			String file = arrayList.get(i);
@@ -337,8 +340,11 @@ public class ByteEncodeUtil {
 		ArrayList<String> list = new ArrayList<String>();
 		if (moduleType == MODULEETYPE.PLUGIN) {// 加密情插件
 			sConstantsClass = "Constants";
-			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\Constants.java";
-			currentEncryptType = EncryptType.NEWENCRYPT;
+			sConstantsAtPackage = "cn.qssq666.redpacket";
+			encryptAtPackage = "cn.qssq666";
+			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\redpacket\\Constants.java";
+			currentEncryptType = EncryptType.OTHERENCRYPT;
+			// currentEncryptType = EncryptType.OTHERENCRYPT;
 			/*
 			 * temp =
 			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
@@ -346,7 +352,9 @@ public class ByteEncodeUtil {
 			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\SetingFragment.java";
 			 * list.add(temp);
 			 */
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\redpacket\\";
+			// temp =
+			// "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
 			list.add(temp);
 			/*
 			 * temp =
@@ -363,12 +371,13 @@ public class ByteEncodeUtil {
 			encryptAtPackage = "cn.qssq666";
 
 			currentEncryptType = EncryptType.NEWENCRYPT;
-			constantsAtPackage = "cn.qssq666.robot.constants";
+			sConstantsAtPackage = "cn.qssq666.robot.constants";
 			sConstantsClass = "EncryptConstants";
-//			useVarQuote = false;
+			// useVarQuote = false;
 			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
-			temp = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\MainActivity.java";
-//			temp=  "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
+			// temp =
+			// "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\MainActivity.java";
+			temp = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
 			list.add(temp);
 			/*
 			 * temp=
@@ -394,6 +403,8 @@ public class ByteEncodeUtil {
 
 		} else if (moduleType == MODULEETYPE.QQ) {// 加密内置Q文件夹
 			currentEncryptType = EncryptType.NEWENCRYPT;
+
+			// cn.qssq666
 			encryptAtPackage = "cn.qssq666";
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\ConstantValue.java";
 			sConstantsClass = "ConstantValue";
@@ -439,8 +450,8 @@ public class ByteEncodeUtil {
 			sConstantClassPath = null;
 			sConstantsClass = null;
 
-			sDecodSimpleClass = "QSSQUtils";
-			decodeMethodName = "QSSQUtils.qssq";
+			sDecodSimpleClass = "LZUtils";
+			decodeMethodName = "LZUtils.qssq";
 			// encryptConfig.setAllowConstantsEmpty(true);//本来就没解密这个东西都不应该有
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\statistics\\ufo";
 			// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\ui\\base\\fw.java";
@@ -564,6 +575,12 @@ public class ByteEncodeUtil {
 		return "public final static int[] " + getVarBaseName(name, isChinese) + "= ";
 	}
 
+	/**
+	 * public final static int[] " + varName + "=
+	 * 
+	 * @param varName
+	 * @return
+	 */
 	private static String getVarName(String varName) {
 		return "public final   static int[] " + varName + "= ";
 	}
@@ -934,7 +951,7 @@ public class ByteEncodeUtil {
 							String temp = matcher.group(1).trim();// 获取匹配yuanzn
 							String arrsStr = matcher.group(2);// 获取匹配yuanzn
 							String[] arr = arr = arrsStr.split(",");
-							String decodeResult = escapeStr( getDeCodeValue(arr));//解密后变成java源码后就可以解决出现多行了特别是换行符简直惨不忍睹
+							String decodeResult = escapeStr(getDeCodeValue(arr));// 解密后变成java源码后就可以解决出现多行了特别是换行符简直惨不忍睹
 							if (debug) {
 								System.out.println("varName[" + temp + "]解密结果:" + decodeResult);
 							}
@@ -1063,6 +1080,55 @@ public class ByteEncodeUtil {
 										+ varName + "]\n所处行:\n" + lineTxt);
 							}
 						}
+
+					} else if (lineTxt.contains(sConstantsClass)) {// 对非加密工具类方法包括的字符串常量进行解密
+
+						Pattern patternVarMethod = Pattern.compile(getDecodConstantsNameReg());
+						// System.err.println("当前可能是变量行行:"+lineTxt);
+						Matcher matcherMethod = patternVarMethod.matcher(lineTxt);
+						while (matcherMethod.find()) {
+							String varName = null;
+							String matchBase = matcherMethod.group();// 获取匹配行不只是暴行这个方法这一个方法所有都在
+							String temp = matcherMethod.group(1);// 取出变量名
+							if (isIntArr(temp)) {// 如果不是变量而是直接的数组
+								String parseResult = anonymousmintArrToParseString(temp);
+								if (parseResult == null) {
+									continue;
+								} else {
+									varName = MD5Util.MD5Encode(temp);
+									sDecodeMap.put(varName, parseResult);
+								}
+							} else {
+
+								varName = temp.replace(sConstantsClass + ".", "");// 除去类名.
+							}
+
+							if (sDecodeMap.containsKey(varName)) {
+
+								String value = sDecodeMap.get(varName);// 解密后文本在另外一个方法已经处理
+
+								decodeCount++;
+								lineTxt = lineTxt.replace(decodeMethodName + "(" + temp + ")", "\"" + value + "\"");// 对函数进行替换
+								// lineTxt = lineTxt.replaceAll("\n",
+								// sBrSign);// 处理里的字符串。
+
+								if (lineTxt.indexOf("\n") != -1) {
+									System.err.println("无法替换\n还是存在(直接常量模式)");
+								}
+								if (debug) {
+
+									System.out.println(
+											"(直接常量模式)找到定义变量名：" + temp + "实际变量值:" + value + "\n替换后当前行:" + lineTxt);
+								}
+
+							} else {
+								errCount++;
+								System.err.println(
+										"(直接常量模式)无法处理变量 因为成员变量中不存在,looadEncodeFieldToHashMap确保解密之前是否调用了加载变量方法,var["
+												+ varName + "]\n所处行:\n" + lineTxt);
+							}
+						}
+
 					}
 					// 两个方法：appendReplacement, appendTail
 					sb.append("" + lineTxt + "\n");
@@ -1130,7 +1196,7 @@ public class ByteEncodeUtil {
 			result = matcherMethod.matches();
 		}
 		if (debug) {
-			System.err.println("加密的字符串是数组=" + result + ",value:" + str);
+			// System.err.println("加密的字符串是数组=" + result + ",value:" + str);
 		}
 		return result;
 	}
@@ -1294,7 +1360,7 @@ public class ByteEncodeUtil {
 	}
 
 	public static String getConstantsImportWordByPackageName() {
-		return getImportWordByPackageName(constantsAtPackage + "." + sConstantsClass);
+		return getImportWordByPackageName(sConstantsAtPackage + "." + sConstantsClass);
 	}
 
 	/**
@@ -1319,8 +1385,8 @@ public class ByteEncodeUtil {
 	}
 
 	public static boolean isExistImportConstantPackage(String content) {
-		return constantsAtPackage == null || constantsAtPackage == ""
-				|| isExistImportPackage(constantsAtPackage + "." + sConstantsClass, content);
+		return sConstantsAtPackage == null || sConstantsAtPackage == ""
+				|| isExistImportPackage(sConstantsAtPackage + "." + sConstantsClass, content);
 	}
 
 	/**
@@ -1501,8 +1567,10 @@ public class ByteEncodeUtil {
 		}
 
 	}
+
 	/**
 	 * 解密
+	 * 
 	 * @param arr
 	 * @return
 	 */
@@ -1575,7 +1643,7 @@ public class ByteEncodeUtil {
 
 	// private int[] a=new int[];
 	/**
-	 * 字符串转int[]数组 字符串java 返回的是 new int[] { }
+	 * 字符串转int[]数组 字符串java      该方法返回的是 赋值的部分 也就是=之后的 对于ints arr加密格式大概是这样  new int[] { } 对于直接字符串乱加密则是="XXDFDFDDFD"
 	 * 
 	 * @param str
 	 *            要加密的字符串 返回一个 new int[]{}加密数组不包含逗号
@@ -1595,7 +1663,7 @@ public class ByteEncodeUtil {
 		 * String.valueOf(new char[]{10}));// 处理特殊符号转义 如果直接\n那么会读入多行不是吗？ if
 		 * (debug) { System.err.println("进行编码加密换行转,转换结果:" + str); } }
 		 */
-		str = unescapeStr(str);//java字符串需要反转义如 变成真正的换行符 
+		str = unescapeStr(str);// java字符串需要反转义如 变成真正的换行符
 		/*
 		 * if (str.indexOf("\\n") != -1) { str = str.replaceAll("\\n",
 		 * String.valueOf(new char[]{10}));// 处理特殊符号转义 如果直接\n那么会读入多行不是吗？ if
@@ -1610,13 +1678,18 @@ public class ByteEncodeUtil {
 		 * "包含特殊转义\\\\字符正在处理 当前包含特殊字符的是:"+str); } }
 		 */
 		// System.err.println("正在加密中。。。处理当前行转义:" + str);
-		return getIntSvARValue(charArrayToEncodeIntArray(str.toCharArray()), str);
+		if (isIntArrEncryptMode) {
+			return getIntSvARValue(charArrayToEncodeIntArray(str.toCharArray()), str);
+		} else {
+			throw new RuntimeException("直接字符串加密模式尚未完善");
+		}
 	}
 
 	/**
-	 * ; 给我一个int数组返回一个字符串 int申明 但是变量接受不包含
+	 * ; 给我一个int数组返回一个字符串 int申明 但是变量接受不包含 return  new int[] { ints的摆列 } 
 	 * 
 	 * @param ints
+	 * @param str 只是用来打印之前的值 没其他作用
 	 * @return
 	 */
 	public static String getIntSvARValue(int[] ints, String str) {
