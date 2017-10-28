@@ -139,7 +139,7 @@ public class ByteEncodeUtil {
 	 */
 	static EncryptType currentEncryptType = EncryptType.NEWENCRYPT;
 
-	public static MODULEETYPE moduleType = MODULEETYPE.PLUGIN;
+	public static MODULEETYPE moduleType = MODULEETYPE.TEST;
 	/**
 	 * 常量的所在包名
 	 */
@@ -389,29 +389,10 @@ public class ByteEncodeUtil {
 			encryptAtPackage = "cn.qssq666";
 			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\redpacket\\Constants.java";
 			currentEncryptType = EncryptType.OTHERENCRYPT;
-			// currentEncryptType = EncryptType.OTHERENCRYPT;
-			/*
-			 * temp =
-			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
-			 * list.add(temp); temp =
-			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\SetingFragment.java";
-			 * list.add(temp);
-			 */
 			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\redpacket\\";
-			// temp =
-			// "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookWeChat.java";
 			list.add(temp);
-			/*
-			 * temp =
-			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\WeChatVersionInit.java";
-			 * list.add(temp); temp =
-			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\QQVersionInit.java";
-			 * list.add(temp); temp =
-			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookTIMQQ.java";
-			 * list.add(temp); temp =
-			 * "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\pro\\redpackaget\\DoHookQQ312to300.java";
-			 * list.add(temp);
-			 */
+			useVarQuote=false;
+		
 		} else if (moduleType == MODULEETYPE.ROBOT) {// 机器人加密
 			encryptAtPackage = "cn.qssq666";
 
@@ -481,7 +462,7 @@ public class ByteEncodeUtil {
 			 * list.add(temp);
 			 */
 		} else if (moduleType == MODULEETYPE.TEST) {
-
+				useVarQuote=false;
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			encryptAtPackage = "cn.qssq666";
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\test\\ConstantValue.java";
@@ -622,6 +603,7 @@ public class ByteEncodeUtil {
 
 			return;
 		}
+
 		OperaInfo info = readTxtFileDecode(path, className);
 		if (!info.isResult() && !encryptConfig.isAllowConstantsEmpty()) {
 			System.err.println("忽略" + file.getName() + "，因为已经解密,无需再次覆盖文件 " + info.getMessage() + "，如要强制执行，请配置加密属性。");
@@ -1190,6 +1172,7 @@ public class ByteEncodeUtil {
 							if (sDecodeMap.containsKey(varName)) {
 
 								String value = sDecodeMap.get(varName);// 解密后文本在另外一个方法已经处理
+//								value=escapeStr(value);//是不是多余我的我不知道
 
 								decodeCount++;
 								lineTxt = lineTxt.replace(decodeMethodName + "(" + temp + ")", "\"" + value + "\"");// 对函数进行替换
@@ -1254,8 +1237,8 @@ public class ByteEncodeUtil {
 
 			String matchBase = matcher.group();// 获取匹配行
 			String arrsStr = matcher.group(1).trim();// 获取匹配yuanzn
-			String[] arr = arr = arrsStr.split(",");
-			String decodeResult = getDeCodeValue(arr);
+			String[] arr = arr = arrsStr.split(",");//得到数组。
+			String decodeResult = escapeStr(getDeCodeValue(arr));
 			return decodeResult;
 		}
 		if (debug) {
