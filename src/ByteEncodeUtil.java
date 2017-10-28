@@ -21,12 +21,22 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 //TODO 下次增加自动清空常量class已经申明的变量功能。
+/**
+ * 对于代码过长 无解，有时候和长度已经没有关系了，需要删除几行中文才能搞定。或者把这些中文另外分到其他的变量文件中去。
+ * 
+ * @author admin
+ *
+ */
 public class ByteEncodeUtil {
 	/**
 	 * 更换加密方式的时候应该把原来储存的常量删除，否则导致还是原来的加密 这里也许不应该用hash，这里只需要判断是否已经加密了而已
 	 */
 	static HashMap<String, String> sEncodeMap = new HashMap<>();
 	public static String sConstantsClass = "ConstantValue";
+	/**
+	 * 是否支持直接解析常量行,
+	 */
+	public static boolean sEnableParseConstantsLine = false;
 	public static String sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\ConstantValue.java";
 
 	static HanyuPinyinHelper hanyuPinyinHelper = new HanyuPinyinHelper();
@@ -42,6 +52,20 @@ public class ByteEncodeUtil {
 	static HashMap<String, String> sDecodeMap = new HashMap<>();
 	static ArrayList<String> sIgnoreFileList = new ArrayList<>();
 	public static EncryptConfig encryptConfig = new EncryptConfig();
+	private static String[] sIgnoresFolder = new String[] {};
+
+	public static boolean isIgnoreFolder(File file) {
+		if (sIgnoresFolder != null) {
+			for (int i = 0; i < sIgnoresFolder.length; i++) {
+				String current = sIgnoresFolder[i];
+				if (file.isDirectory() && file.getName().equals(current)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private static final String sIGNORE_DECODE = "IGNORE_DECODE";
 	/*
 	 * "\"(.*?)\"" int[] QSSQ__with_uin_eq_ = new int[]{38, 117, 105, 110,
@@ -97,15 +121,17 @@ public class ByteEncodeUtil {
 
 	// TODO 有待添加常量导包功能
 	private final static String sBrSign = "brbr";
+	private final static boolean maxArrWarning = false;
 
 	enum MODULEETYPE {
-		QQ, WECHAT, PLUGIN, PUBLIC_FOLDER, ROBOT, MIAO, CRACK_SIGN, OTHER
+		QQ, QQ_2, TEST, WECHAT, PLUGIN, PUBLIC_FOLDER, ROBOT, MIAO, CRACK_SIGN, OTHER
 
 	}
 
 	public enum EncryptType {
-		NEWENCRYPT, OLDENCRYPT, OTHERENCRYPT,
-		STR_SHOW_ENCRYPT//字符串加密类型是2017年8月10日 22:19:39 最新构思的一种加密方式，是直接显示字符串的方式，不过如果让你好123加密之后长度不会更长就是一个蛋疼的问题。
+		NEWENCRYPT, OLDENCRYPT, OTHERENCRYPT, STR_SHOW_ENCRYPT// 字符串加密类型是2017年8月10日
+																// 22:19:39
+																// 最新构思的一种加密方式，是直接显示字符串的方式，不过如果让你好123加密之后长度不会更长就是一个蛋疼的问题。
 	}
 
 	/**
@@ -113,11 +139,12 @@ public class ByteEncodeUtil {
 	 */
 	static EncryptType currentEncryptType = EncryptType.NEWENCRYPT;
 
-	public static MODULEETYPE moduleType = MODULEETYPE.QQ;
+	public static MODULEETYPE moduleType = MODULEETYPE.PLUGIN;
 	/**
 	 * 常量的所在包名
 	 */
 	private static String sConstantsAtPackage;
+	private static boolean encryptNumber = false;
 
 	public static void main(String[] args) {
 		String lineText = "开始\n结束 如果还是换行了说明替换失败\b \b \b \t \t \r\n  多重转义\\\\n \\\\r";
@@ -125,8 +152,26 @@ public class ByteEncodeUtil {
 		System.out.println("解析后替换变量结果" + unescapeStr(lineText));
 
 		debug = true;
-		decodeJavaAndroid();
-		// encodeJavaAndroid();
+		maxArrLength = 89;
+		boolean encyrpt = 1 % 2 == 0;
+
+		// boolean encyrpt=false;
+		if (encyrpt) {
+			encodeJavaAndroid();
+
+		} else {
+			decodeJavaAndroid();
+		}
+		if (moduleType == MODULEETYPE.QQ) {
+			moduleType = MODULEETYPE.QQ_2;
+			if (encyrpt) {
+				encodeJavaAndroid();
+
+			} else {
+				decodeJavaAndroid();
+			}
+		}
+
 		getFileArrayList();
 
 		// encodeJavaAndroid();
@@ -266,7 +311,7 @@ public class ByteEncodeUtil {
 
 	protected static void doEncodeAllJava(String path) {
 		File file = new File(path);
-		if (file.isDirectory()) {
+		if (file.isDirectory() && !isIgnoreFolder(file)) {
 			File[] listFile = file.listFiles();
 			if (listFile != null) {
 				for (int i = 0; i < listFile.length; i++) {
@@ -388,7 +433,7 @@ public class ByteEncodeUtil {
 		} else if (11 == 1133) {// 共同qita微信常量修复qssq6666根目录文件夹
 
 			currentEncryptType = EncryptType.NEWENCRYPT;
-			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\ConstantValue.java";
+			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\qqproguard\\wechat\\Cns.java";
 			temp = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666";
 			list.add(temp);
 
@@ -406,9 +451,9 @@ public class ByteEncodeUtil {
 
 			// cn.qssq666
 			encryptAtPackage = "cn.qssq666";
-			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\ConstantValue.java";
+			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\a1\\ConstantValue.java";
 			sConstantsClass = "ConstantValue";
-			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\a1";
 			list.add(temp);
 			// temp =
 			// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\EncryptUtil.java";
@@ -418,6 +463,32 @@ public class ByteEncodeUtil {
 			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\NetQuery.java";
 			 * list.add(temp);
 			 */
+		} else if (moduleType == MODULEETYPE.QQ_2) {// 加密内置Q文件夹
+			currentEncryptType = EncryptType.NEWENCRYPT;
+
+			// cn.qssq666
+			encryptAtPackage = "cn.qssq666";
+			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\a2\\ConstantValue2.java";
+			sConstantsClass = "ConstantValue2";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\a2";
+			list.add(temp);
+			// temp =
+			// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\EncryptUtil.java";
+			// list.add(temp);
+			/*
+			 * temp=
+			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\NetQuery.java";
+			 * list.add(temp);
+			 */
+		} else if (moduleType == MODULEETYPE.TEST) {
+
+			currentEncryptType = EncryptType.NEWENCRYPT;
+			encryptAtPackage = "cn.qssq666";
+			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\test\\ConstantValue.java";
+			sConstantsClass = "ConstantValue";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\test\\TestVar.java";
+			list.add(temp);
+
 		} else if (moduleType == MODULEETYPE.WECHAT) {// 插入微信Sscon加密 文件夹批量
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			encryptAtPackage = "cn.qssq666";
@@ -531,7 +602,7 @@ public class ByteEncodeUtil {
 	 */
 	protected static void doDecodeAllJava(String path) {
 		File file = new File(path);
-		if (file.isDirectory()) {
+		if (file.isDirectory()&& !isIgnoreFolder(file)) {
 			File[] listFile = file.listFiles();
 			if (listFile != null) {
 				for (int i = 0; i < listFile.length; i++) {
@@ -672,7 +743,7 @@ public class ByteEncodeUtil {
 		temp = temp.replaceAll("	", "");
 		temp = temp.replaceAll(" ", "");
 		String temp1 = "QSSQ_" + (isChinese ? hanyuPinyinHelper.toHanyuPinyin(temp) : temp);
-		if (temp1.length() > 40) {
+		if (temp1.length() > 20) {
 			String frist = temp1.substring(0, 20);
 			frist = frist.replaceAll(" ", "");
 			temp1 = frist + MD5Util.MD5Encode(temp1);
@@ -835,7 +906,7 @@ public class ByteEncodeUtil {
 						if (temp != null && temp != "" && temp != "," && temp != "&" && temp.length() > 0) {
 							boolean isChinese = checkChinese(temp);
 
-							if (isChinese || checkZimu(temp)) {
+							if (isChinese || checkZimu(temp) || checkNumber(temp)) {
 								String baseVar = getVarBaseName(temp, isChinese);
 								if (!sEncodeMap.containsKey(baseVar)) {
 									if (sDecodeMap.containsKey(baseVar)) {
@@ -892,6 +963,19 @@ public class ByteEncodeUtil {
 	public static boolean checkZimu(String str) {
 
 		Pattern p = Pattern.compile("[a-zA-Z]");
+		Matcher m = p.matcher(str);
+		if (m.find()) {
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean checkNumber(String str) {
+
+		if (!encryptNumber) {
+			return false;
+		}
+		Pattern p = Pattern.compile("[0-9]");
 		Matcher m = p.matcher(str);
 		if (m.find()) {
 			return true;
@@ -1081,7 +1165,7 @@ public class ByteEncodeUtil {
 							}
 						}
 
-					} else if (lineTxt.contains(sConstantsClass)) {// 对非加密工具类方法包括的字符串常量进行解密
+					} else if (sEnableParseConstantsLine && lineTxt.contains(sConstantsClass)) {// 对非加密工具类方法包括的字符串常量进行解密
 
 						Pattern patternVarMethod = Pattern.compile(getDecodConstantsNameReg());
 						// System.err.println("当前可能是变量行行:"+lineTxt);
@@ -1089,7 +1173,7 @@ public class ByteEncodeUtil {
 						while (matcherMethod.find()) {
 							String varName = null;
 							String matchBase = matcherMethod.group();// 获取匹配行不只是暴行这个方法这一个方法所有都在
-							String temp = matcherMethod.group(1);// 取出变量名
+							String temp = matcherMethod.group(0);// 取出变量名
 							if (isIntArr(temp)) {// 如果不是变量而是直接的数组
 								String parseResult = anonymousmintArrToParseString(temp);
 								if (parseResult == null) {
@@ -1242,13 +1326,13 @@ public class ByteEncodeUtil {
 						Matcher matcher = pattern.matcher(lineTxt);
 						while (matcher.find()) {
 							String matchBase = matcher.group();
-							// System.err.println("match:" +);//这里匹配返回的包含引号
+							System.err.println("match:" + matchBase);// 这里匹配返回的包含引号
 							String temp = matcher.group(1);// 不包含双引号
 							if (temp != null && temp != "" && temp != "," && temp != "&" && temp.trim().length() > 0) {
 								if (useVarQuote) {
 									boolean isChinese = checkChinese(temp);
 
-									if (isChinese || checkZimu(temp)) {
+									if (isChinese || checkZimu(temp) || checkNumber(temp)) {
 										String baseVar = getVarBaseName(temp, isChinese);
 										if (!sEncodeMap.containsKey(baseVar)) {
 											existVarCount++;
@@ -1614,7 +1698,7 @@ public class ByteEncodeUtil {
 		}
 	}
 
-	private static int maxArrLength = 1940;
+	private static int maxArrLength = 100;
 
 	public static int getEncodeIntValue(int value, int encryptValue) {
 		if (currentEncryptType == EncryptType.NEWENCRYPT || currentEncryptType == EncryptType.OLDENCRYPT) {
@@ -1643,7 +1727,8 @@ public class ByteEncodeUtil {
 
 	// private int[] a=new int[];
 	/**
-	 * 字符串转int[]数组 字符串java      该方法返回的是 赋值的部分 也就是=之后的 对于ints arr加密格式大概是这样  new int[] { } 对于直接字符串乱加密则是="XXDFDFDDFD"
+	 * 字符串转int[]数组 字符串java 该方法返回的是 赋值的部分 也就是=之后的 对于ints arr加密格式大概是这样 new int[] {
+	 * } 对于直接字符串乱加密则是="XXDFDFDDFD"
 	 * 
 	 * @param str
 	 *            要加密的字符串 返回一个 new int[]{}加密数组不包含逗号
@@ -1679,24 +1764,43 @@ public class ByteEncodeUtil {
 		 */
 		// System.err.println("正在加密中。。。处理当前行转义:" + str);
 		if (isIntArrEncryptMode) {
-			return getIntSvARValue(charArrayToEncodeIntArray(str.toCharArray()), str);
+			int[] temp = charArrayToEncodeIntArray(str.toCharArray());
+
+			return getIntSvARValue(temp, str);
 		} else {
 			throw new RuntimeException("直接字符串加密模式尚未完善");
 		}
 	}
 
 	/**
-	 * ; 给我一个int数组返回一个字符串 int申明 但是变量接受不包含 return  new int[] { ints的摆列 } 
+	 * ; 给我一个int数组返回一个字符串 int申明 但是变量接受不包含 return new int[] { ints的摆列 }
+	 * 如果要触发本代码，需要先删除常量文件之前缓存的文件，我自己写的代码自己都搞不懂是啥逻辑了，毕竟思想没有变成图形。有点乱。
 	 * 
 	 * @param ints
-	 * @param str 只是用来打印之前的值 没其他作用
+	 * @param str
+	 *            只是用来打印之前的值 没其他作用
 	 * @return
 	 */
 	public static String getIntSvARValue(int[] ints, String str) {
 		char[] chars = new char[ints.length];
 		if (chars.length > maxArrLength) {
-			throw new RuntimeException("无法处理加密数组 数组过长，最多" + maxArrLength
-					+ "个数组，请适当切割字符串,数组太长会导致报错【Error:(34, 29) 错误: 代码过长 】异常数组长度" + ints.length + ",值:" + str);
+			if (maxArrWarning) {
+				System.err.println("wraning :he array code is too long to compile ,current length:" + chars.length
+						+ ",str is:" + str);
+			} else {
+				throw new RuntimeException("无法处理加密数组 数组过长，最多" + maxArrLength
+						+ "个数组，请适当切割字符串,数组太长会导致报错【Error:(34, 29) 错误: 代码过长 】异常数组长度" + ints.length + ",值:" + str);
+
+			}
+
+		} else {
+			/*
+			 * System.out.println("chars.length:"+chars.length); if(true){ throw
+			 * new RuntimeException("无法处理加密数组 数组过长，最多" + maxArrLength +
+			 * "个数组，请适当切割字符串,数组太长会导致报错【Error:(34, 29) 错误: 代码过长 】异常数组长度" +
+			 * ints.length + ",值:" + str); }
+			 */
+
 		}
 		StringBuilder sbChars = new StringBuilder();
 		sbChars.append("new int[]{");
