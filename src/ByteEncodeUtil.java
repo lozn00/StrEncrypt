@@ -103,14 +103,19 @@ public class ByteEncodeUtil {
 	/**
 	 * 加密工具里面的解密方法
 	 */
-	public static String decodeMethodName = sDecodSimpleClass + ".decode";
+	// public static String fetchDecodeMethod = sDecodSimpleClass + ".decode";
+	public static String sDecodeMethod = "decode";
+
+	public static String fetchCallFullDecodeMethod(String methodName) {
+		return sDecodSimpleClass + "." + methodName;
+	}
 
 	/*
 	 * "\"(.*?)\""
 	 */
 	public static final String getDecodeMethodNameReg() {
 
-		return ".*?" + decodeMethodName + "\\((.*?)\\)" + ".*?";
+		return ".*?" + fetchCallFullDecodeMethod(sDecodeMethod) + "\\((.*?)\\)" + ".*?";
 	}
 
 	public static final String getDecodConstantsNameReg() {
@@ -121,7 +126,7 @@ public class ByteEncodeUtil {
 
 	// TODO 有待添加常量导包功能
 	private final static String sBrSign = "brbr";
-	private final static boolean maxArrWarning = false;
+	private final static boolean maxArrWarning = true;
 
 	enum MODULEETYPE {
 		QQ, QQ_2, TEST, WECHAT, PLUGIN, PUBLIC_FOLDER, ROBOT, MIAO, CRACK_SIGN, OTHER
@@ -139,7 +144,7 @@ public class ByteEncodeUtil {
 	 */
 	static EncryptType currentEncryptType = EncryptType.NEWENCRYPT;
 
-	public static MODULEETYPE moduleType = MODULEETYPE.TEST;
+	public static MODULEETYPE moduleType = MODULEETYPE.PLUGIN;
 	/**
 	 * 常量的所在包名
 	 */
@@ -153,7 +158,8 @@ public class ByteEncodeUtil {
 
 		debug = true;
 		maxArrLength = 89;
-		boolean encyrpt = 1 % 2 == 0;
+		boolean encyrpt = 2 % 2 == 0;// 2 represents encrypt 1 represents
+										// decrypt
 
 		// boolean encyrpt=false;
 		if (encyrpt) {
@@ -372,7 +378,7 @@ public class ByteEncodeUtil {
 	 * @return
 	 */
 	public static final String getDecodeMethodNameCall(String name) {
-		return decodeMethodName + "(" + name + ")";
+		return fetchCallFullDecodeMethod(sDecodeMethod) + "(" + name + ")";
 	}
 
 	/**
@@ -385,14 +391,18 @@ public class ByteEncodeUtil {
 		ArrayList<String> list = new ArrayList<String>();
 		if (moduleType == MODULEETYPE.PLUGIN) {// 加密情插件
 			sConstantsClass = "Constants";
+			// sDecodSimpleClass="EncryptUtil";
+			sDecodSimpleClass = "EncryptUtilX";
+			// fetchDecodeMethod = sDecodSimpleClass + ".decode";
+
 			sConstantsAtPackage = "cn.qssq666.redpacket";
 			encryptAtPackage = "cn.qssq666";
 			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\redpacket\\Constants.java";
 			currentEncryptType = EncryptType.OTHERENCRYPT;
 			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\redpacket\\";
 			list.add(temp);
-			useVarQuote=false;
-		
+			useVarQuote = false;
+
 		} else if (moduleType == MODULEETYPE.ROBOT) {// 机器人加密
 			encryptAtPackage = "cn.qssq666";
 
@@ -462,12 +472,12 @@ public class ByteEncodeUtil {
 			 * list.add(temp);
 			 */
 		} else if (moduleType == MODULEETYPE.TEST) {
-				useVarQuote=false;
+			useVarQuote = false;
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			encryptAtPackage = "cn.qssq666";
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\test\\ConstantValue.java";
 			sConstantsClass = "ConstantValue";
-			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\test\\TestVar.java";
+			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\test";
 			list.add(temp);
 
 		} else if (moduleType == MODULEETYPE.WECHAT) {// 插入微信Sscon加密 文件夹批量
@@ -503,7 +513,9 @@ public class ByteEncodeUtil {
 			sConstantsClass = null;
 
 			sDecodSimpleClass = "LZUtils";
-			decodeMethodName = "LZUtils.qssq";
+			// fetchDecodeMethod(sDecodeMethod)
+			sDecodeMethod = "hello";
+			// fetchDecodeMethod = "LZUtils.hello";
 			// encryptConfig.setAllowConstantsEmpty(true);//本来就没解密这个东西都不应该有
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\statistics\\ufo";
 			// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\ui\\base\\fw.java";
@@ -515,7 +527,8 @@ public class ByteEncodeUtil {
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\ui\\base\\fw.java";
 			sConstantsClass = "fw";
 			sDecodSimpleClass = "fw";
-			decodeMethodName = "fw.sss";
+			sDecodeMethod = "sss";
+			// fetchDecodeMethod = "fw.sss";
 			// encryptConfig.setAllowConstantsEmpty(true);//本来就没解密这个东西都不应该有
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\ui\\base\\fw.java";
 			list.add(temp);
@@ -583,7 +596,7 @@ public class ByteEncodeUtil {
 	 */
 	protected static void doDecodeAllJava(String path) {
 		File file = new File(path);
-		if (file.isDirectory()&& !isIgnoreFolder(file)) {
+		if (file.isDirectory() && !isIgnoreFolder(file)) {
 			File[] listFile = file.listFiles();
 			if (listFile != null) {
 				for (int i = 0; i < listFile.length; i++) {
@@ -1102,7 +1115,7 @@ public class ByteEncodeUtil {
 				String lineTxt = null;
 				while ((lineTxt = bufferedReader.readLine()) != null) {
 					// 判断是否是加密方法
-					if (lineTxt.contains(decodeMethodName)) {
+					if (lineTxt.contains(fetchCallFullDecodeMethod(sDecodeMethod))) {
 						Pattern patternVarMethod = Pattern.compile(getDecodeMethodNameReg());
 						// System.err.println("当前可能是变量行行:"+lineTxt);
 						Matcher matcherMethod = patternVarMethod.matcher(lineTxt);
@@ -1128,7 +1141,8 @@ public class ByteEncodeUtil {
 								String value = sDecodeMap.get(varName);// 解密后文本在另外一个方法已经处理
 
 								decodeCount++;
-								lineTxt = lineTxt.replace(decodeMethodName + "(" + temp + ")", "\"" + value + "\"");// 对函数进行替换
+								lineTxt = lineTxt.replace(fetchCallFullDecodeMethod(sDecodeMethod) + "(" + temp + ")",
+										"\"" + value + "\"");// 对函数进行替换
 								// lineTxt = lineTxt.replaceAll("\n",
 								// sBrSign);// 处理里的字符串。
 
@@ -1172,10 +1186,11 @@ public class ByteEncodeUtil {
 							if (sDecodeMap.containsKey(varName)) {
 
 								String value = sDecodeMap.get(varName);// 解密后文本在另外一个方法已经处理
-//								value=escapeStr(value);//是不是多余我的我不知道
+								// value=escapeStr(value);//是不是多余我的我不知道
 
 								decodeCount++;
-								lineTxt = lineTxt.replace(decodeMethodName + "(" + temp + ")", "\"" + value + "\"");// 对函数进行替换
+								lineTxt = lineTxt.replace(fetchCallFullDecodeMethod(sDecodeMethod) + "(" + temp + ")",
+										"\"" + value + "\"");// 对函数进行替换
 								// lineTxt = lineTxt.replaceAll("\n",
 								// sBrSign);// 处理里的字符串。
 
@@ -1237,7 +1252,7 @@ public class ByteEncodeUtil {
 
 			String matchBase = matcher.group();// 获取匹配行
 			String arrsStr = matcher.group(1).trim();// 获取匹配yuanzn
-			String[] arr = arr = arrsStr.split(",");//得到数组。
+			String[] arr = arr = arrsStr.split(",");// 得到数组。
 			String decodeResult = escapeStr(getDeCodeValue(arr));
 			return decodeResult;
 		}
@@ -1681,7 +1696,8 @@ public class ByteEncodeUtil {
 		}
 	}
 
-	private static int maxArrLength = 100;
+	private static int maxArrLength = 500;
+	// private static int maxArrLength = 100;
 
 	public static int getEncodeIntValue(int value, int encryptValue) {
 		if (currentEncryptType == EncryptType.NEWENCRYPT || currentEncryptType == EncryptType.OLDENCRYPT) {
@@ -1823,10 +1839,10 @@ public class ByteEncodeUtil {
 		String temp = text.replaceAll(" ", "");
 		temp = temp.replaceAll("	", "");
 
-		if (temp.contains("ignore_exclude")) {
+		if (temp.toLowerCase().contains("ignore_exclude")) {
 			return false;// 表示必须加密的，
 		}
-		if (temp.contains("ignore_include")) {
+		if (temp.toLowerCase().contains("ignore_include")) {
 			return true;// 表示无需加密
 		}
 
