@@ -66,7 +66,7 @@ public class ByteEncodeUtil {
 			for (int i = 0; i < sIgnoresFolder.length; i++) {
 				String current = sIgnoresFolder[i];
 				if (file.isDirectory() && file.getName().equals(current)) {
-					System.out.println("忽略文件"+file.getAbsolutePath()+",包含"+current);
+					System.out.println("忽略文件" + file.getAbsolutePath() + ",包含" + current);
 					return true;
 				}
 			}
@@ -169,7 +169,7 @@ public class ByteEncodeUtil {
 	private final static boolean maxArrWarning = true;
 
 	enum MODULEETYPE {
-		QQ, QQ_2, TEST, WECHAT, PLUGIN, PUBLIC_FOLDER, ROBOT, MIAO, CRACK_SIGN, OTHER, TEST_OTHER_ROBOT, TEST_OTHER_ROBOT_PLUGIN
+		QQ, QQ_2, QQ_MODULE, QQ_2_MODULE, QQ_MODULE_TEST,TEST, WECHAT, PLUGIN, PUBLIC_FOLDER, ROBOT, MIAO, CRACK_SIGN, OTHER, TEST_OTHER_ROBOT, TEST_OTHER_ROBOT_PLUGIN
 
 	}
 
@@ -218,7 +218,7 @@ public class ByteEncodeUtil {
 		 * return; }
 		 */
 		maxArrLength = 89;
-		boolean encyrpt = 2 % 2 == 0;// 2 represents encrypt 1 represents
+		boolean encyrpt = 1 % 2 == 0;// 2 represents encrypt 1 represents
 		// boolean encyrpt=false;
 		if (encyrpt) {
 			encodeJavaAndroid();
@@ -230,7 +230,13 @@ public class ByteEncodeUtil {
 			moduleType = MODULEETYPE.QQ_2;
 			if (encyrpt) {
 				encodeJavaAndroid();
-
+			} else {
+				decodeJavaAndroid();
+			}
+		} else if (moduleType == MODULEETYPE.QQ_MODULE) {
+			moduleType = MODULEETYPE.QQ_2_MODULE;
+			if (encyrpt) {
+				encodeJavaAndroid();
 			} else {
 				decodeJavaAndroid();
 			}
@@ -307,7 +313,7 @@ public class ByteEncodeUtil {
 		if (debug == DebugLevel.All) {
 			System.out.println("准备加载常量文件" + sConstantClassPath + ",类" + sConstantsClass);
 		}
-		if (currentEncryptType == EncryptType.STR_SHOW_ENCRYPT ||currentEncryptType==EncryptType.CUSTROM_CALL_QUTO) {// 字符串加密的方法暂时不提取。
+		if (currentEncryptType == EncryptType.STR_SHOW_ENCRYPT || currentEncryptType == EncryptType.CUSTROM_CALL_QUTO) {// 字符串加密的方法暂时不提取。
 
 		} else {
 
@@ -382,14 +388,14 @@ public class ByteEncodeUtil {
 		File file = new File(path);
 		if (file.isDirectory() && !isIgnoreFolder(file)) {
 			File[] listFile = file.listFiles();
-			if (listFile != null&&listFile.length>0) {
-				System.out.println("目录"+file.getAbsolutePath()+"总数："+listFile.length);
+			if (listFile != null && listFile.length > 0) {
+				System.out.println("目录" + file.getAbsolutePath() + "总数：" + listFile.length);
 				for (int i = 0; i < listFile.length; i++) {
 					if (listFile[i].isDirectory()) {
-//						File[] currenChildFile = listFile[i].listFiles();
-						
+						// File[] currenChildFile = listFile[i].listFiles();
+
 						doEncodeAllJava(listFile[i].getAbsolutePath());
-//						doEncodeAllJava(listFile[i].getAbsolutePath());
+						// doEncodeAllJava(listFile[i].getAbsolutePath());
 					} else {
 						if (isIgnoreFiles(listFile[i])) {
 							System.err.println("忽略文件:" + listFile[i]);
@@ -399,8 +405,8 @@ public class ByteEncodeUtil {
 						}
 					}
 				}
-			}else{
-				System.err.println("无法读取目录:"+file.getAbsolutePath()+",是否存在:"+file.exists());
+			} else {
+				System.err.println("无法读取目录:" + file.getAbsolutePath() + ",是否存在:" + file.exists());
 			}
 		} else {
 			if (path.equals(sConstantClassPath)) {
@@ -475,9 +481,9 @@ public class ByteEncodeUtil {
 
 			sConstantsAtPackage = "cn.qssq666.redpacket";
 			encryptAtPackage = "cn.qssq666";
-			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\redpacket\\Constants.java";
+			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\app\\src\\main\\java\\cn\\qssq666\\redpacket\\Constants.java";
 			currentEncryptType = EncryptType.OTHERENCRYPT;
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\cn\\qssq666\\redpacket\\";
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\app\\src\\main\\java\\cn\\qssq666\\redpacket\\";
 			list.add(temp);
 			useVarQuote = UseVarQuote.no;
 
@@ -491,7 +497,7 @@ public class ByteEncodeUtil {
 			sConstantsAtPackage = "noconstants";
 			// useVarQuote = false; C0202ooo.o
 			useVarQuote = UseVarQuote.str;// 爆满了代码过长使用随机
-			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
+			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\childgit\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
 			temp = "F:\\QQ_weichat\\crackstr\\classes.dex_src";
 			// temp =
 			// "F:\\QQ_weichat\\crackstr\\classes.dex_src\\com\\luomi\\lm\\morethreads\\db";
@@ -502,7 +508,7 @@ public class ByteEncodeUtil {
 
 			sConstantsClass = "noconstants";
 			sDecodSimpleClass = "C0202ooo"; // C0202ooo.o C0202ooo.o
-			sDecodeMethod = "o";//F:\QQ_weichat\crackstr\gruppluginclasses.dex_src
+			sDecodeMethod = "o";// F:\QQ_weichat\crackstr\gruppluginclasses.dex_src
 			encryptAtPackage = "cn.qssq666";
 			currentEncryptType = EncryptType.CUSTROM_CALL_QUTO;
 			sConstantsAtPackage = "noconstants";
@@ -523,9 +529,10 @@ public class ByteEncodeUtil {
 			// useVarQuote = false; C0202ooo.o
 			useVarQuote = UseVarQuote.str;// 爆满了代码过长使用随机
 			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
-//			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
+			// sConstantClassPath =
+			// "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
 			temp = "F:\\QQ_weichat\\crackstr\\gruppluginclasses.dex_src\\";
-//			temp = "F:\\QQ_weichat\\crackstr\\classes.dexplugin_src";
+			// temp = "F:\\QQ_weichat\\crackstr\\classes.dexplugin_src";
 			// temp =
 			// "F:\\QQ_weichat\\crackstr\\classes.dex_src\\com\\luomi\\lm\\morethreads\\db";
 			list.add(temp);
@@ -534,14 +541,16 @@ public class ByteEncodeUtil {
 		} else if (moduleType == MODULEETYPE.ROBOT) {// 机器人加密
 			encryptAtPackage = "cn.qssq666";
 			currentEncryptType = EncryptType.NEWENCRYPT;
+			sDecodeMethod = "a7";
 			sConstantsAtPackage = "cn.qssq666.robot.constants";
+			sDecodSimpleClass = "EncryptUtilN";
 			sConstantsClass = "EncryptConstants";
 			// useVarQuote = false;
 			useVarQuote = UseVarQuote.no;// 爆满了代码过长使用随机
-			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
+			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\childgit\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
 			// temp =
 			// "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\MainActivity.java";
-			temp = "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
+			temp = "F:\\src\\git_project\\qq_qqrobot\\childgit\\app\\src\\main\\java\\cn\\qssq666\\robot";
 			list.add(temp);
 			/*
 			 * temp=
@@ -574,17 +583,9 @@ public class ByteEncodeUtil {
 					+ sConstantsClass + ".java";
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\a1";
 			list.add(temp);
-			// temp =
-			// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\EncryptUtil.java";
-			// list.add(temp);
-			/*
-			 * temp=
-			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\NetQuery.java";
-			 * list.add(temp);
-			 */
 		} else if (moduleType == MODULEETYPE.QQ_2) {// 加密内置Q文件夹
 			currentEncryptType = EncryptType.NEWENCRYPT;
-
+			sDecodSimpleClass = "EncryptUtilN";
 			// cn.qssq666
 			encryptAtPackage = "cn.qssq666";
 			sConstantsClass = "Value2";
@@ -592,21 +593,47 @@ public class ByteEncodeUtil {
 					+ sConstantsClass + ".java";
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\qssqproguard\\a2";
 			list.add(temp);
-			// temp =
-			// "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\EncryptUtil.java";
-			// list.add(temp);
-			/*
-			 * temp=
-			 * "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\cn\\qssq666\\NetQuery.java";
-			 * list.add(temp);
-			 */
-		} else if (moduleType == MODULEETYPE.TEST) {
+
+		} else if (moduleType == MODULEETYPE.QQ_MODULE) {// 加密内置Q文件夹
+			currentEncryptType = EncryptType.NEWENCRYPT;
+			sDecodSimpleClass = "EncryptUtilN";
+			// cn.qssq666
+			encryptAtPackage = "cn.qssq666";
+			sConstantsClass = "Values1";
+			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a1\\"
+					+ sConstantsClass + ".java";
+			temp ="F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a1";
+			list.add(temp);
+		} else if (moduleType == MODULEETYPE.QQ_2_MODULE) {// 加密内置Q文件夹
+			currentEncryptType = EncryptType.NEWENCRYPT;
+			// cn.qssq666
+			encryptAtPackage = "cn.qssq666";
+			sConstantsClass = "Value2";
+			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
+					+ sConstantsClass + ".java";
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2";
+			list.add(temp);
+
+		} else if (moduleType == MODULEETYPE.QQ_MODULE_TEST) {// 加密内置Q文件夹
+			useVarQuote=UseVarQuote.no;
+			currentEncryptType = EncryptType.NEWENCRYPT;
+			// cn.qssq666
+			encryptAtPackage = "cn.qssq666";
+			temp ="F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\tool\\TestEncrypt.java";
+			sConstantsClass = "Value2";
+			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
+					+ sConstantsClass + ".java";
+			list.add(temp);
+
+		}else if (moduleType == MODULEETYPE.TEST) {
 			useVarQuote = UseVarQuote.no;
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			encryptAtPackage = "cn.qssq666";
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\test\\ConstantValue.java";
 			sConstantsClass = "ConstantValue";
-			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\test";
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\testjniapp\\src\\main\\java\\cn\\qssq666\\testjnimodule\\TestVar.java";
+			list.add(temp);
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\com\\tencent\\mobileqq\\activity\\aio\\SessionInfo.java";
 			list.add(temp);
 
 		} else if (moduleType == MODULEETYPE.WECHAT) {// 插入微信Sscon加密 文件夹批量
@@ -741,7 +768,7 @@ public class ByteEncodeUtil {
 		String className = FilenameUtils.getBaseName(file.getAbsolutePath());
 		if (!"java".equals(expandsName)) {
 			System.out.println("extensionName:" + expandsName + ",className:" + className);// extensionName:txt,className:fw
-			System.out.println("忽略文件 非java文件:" + file.getAbsolutePath()+",是否是文件"+file.isFile());
+			System.out.println("忽略文件 非java文件:" + file.getAbsolutePath() + ",是否是文件" + file.isFile());
 
 			return;
 		}
@@ -900,8 +927,8 @@ public class ByteEncodeUtil {
 
 	/**
 	 * 
-	 * 整个流程是先读入常量 然后写入常量然后再循环一遍再操作一次
-	 * 读入加密字符串并写入常量文件 
+	 * 整个流程是先读入常量 然后写入常量然后再循环一遍再操作一次 读入加密字符串并写入常量文件
+	 * 
 	 * @param list
 	 */
 	public static void readEncodeVarArrayList(ArrayList<String> list) {
@@ -942,9 +969,9 @@ public class ByteEncodeUtil {
 		 * 
 		 * e1.printStackTrace(); }
 		 */
-		
-		if(useVarQuote==UseVarQuote.str ||useVarQuote==UseVarQuote.no){
-			System.out.println("当前模式忽略写入常量加密数组到文件，模式:"+useVarQuote);
+
+		if (useVarQuote == UseVarQuote.str || useVarQuote == UseVarQuote.no) {
+			System.out.println("当前模式忽略写入常量加密数组到文件，模式:" + useVarQuote);
 			return;
 		}
 		try {
@@ -968,8 +995,8 @@ public class ByteEncodeUtil {
 		// System.out.println();
 
 		String patternString = "\"(.*?)\"";// 取出双引号
-		StringBuffer sb = new StringBuffer();
-		StringBuffer varNameSb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
+		StringBuilder varNameSb = new StringBuilder(40);
 
 		try {
 			String encoding = "utf-8";
@@ -983,7 +1010,7 @@ public class ByteEncodeUtil {
 		return insertFieldAtConstantClassAfter(vardeclareJava, varNameSb.toString());
 	}
 
-	private static void loopEncryptEncodeConstant(File[] filePath, String patternString, StringBuffer varNameSb,
+	private static void loopEncryptEncodeConstant(File[] filePath, String patternString, StringBuilder varNameSb,
 			String encoding) throws UnsupportedEncodingException, FileNotFoundException, IOException {
 		for (int i = 0; i < filePath.length; i++) {
 			if (filePath[i] != null) {
@@ -1007,7 +1034,7 @@ public class ByteEncodeUtil {
 		}
 	}
 
-	private static void doTempConstants(File filePath, String patternString, StringBuffer varNameSb, String encoding)
+	private static void doTempConstants(File filePath, String patternString, StringBuilder varNameSb, String encoding)
 			throws UnsupportedEncodingException, FileNotFoundException, IOException {
 		String className = getClassNameByFile(filePath);
 		varNameSb.append(getInsertSplitLine(className));
@@ -1142,7 +1169,7 @@ public class ByteEncodeUtil {
 
 		// System.out.println();
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder(50);
 		try {
 			String encoding = "utf-8";
 			File file = new File(filePath);
@@ -1246,7 +1273,7 @@ public class ByteEncodeUtil {
 
 		// System.out.println();
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder(50);
 		if (debug.getValue() >= DebugLevel.All.getValue()) {
 			System.out.println("读取" + filePath + "中");
 		}
@@ -1285,7 +1312,7 @@ public class ByteEncodeUtil {
 									varName = MD5Util.MD5Encode(temp);
 									sDecodeMap.put(varName, parseResult);
 								}
-							} else if (isStrEncrypt(temp)) {
+							} else if (isStrEncrypt(temp) && EncryptType.NEWENCRYPT != currentEncryptType) {
 								if (currentEncryptType == EncryptType.STR_SHOW_ENCRYPT) {
 									String tempFix = temp.substring(1, temp.length() - 1);
 
@@ -1505,7 +1532,7 @@ public class ByteEncodeUtil {
 		// System.out.println();
 
 		String patternString = "\"(.*?)\"";
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder(50);
 		try {
 			String encoding = "utf-8";
 			File file = new File(filePath);
@@ -1644,9 +1671,11 @@ public class ByteEncodeUtil {
 		if (!isExistImportEncryptUtilPackage(result)) {
 			result = insertPackAage(simpleClassName, result, getEncryptImportWordByPackageName());
 		}
-	/*	if (!isExistImportConstantPackage(result)) {
-			result = insertPackAage(simpleClassName, result, getConstantsImportWordByPackageName());
-		}*/
+		/*
+		 * if (!isExistImportConstantPackage(result)) { result =
+		 * insertPackAage(simpleClassName, result,
+		 * getConstantsImportWordByPackageName()); }
+		 */
 
 		if (result == null) {
 			result = sb.toString();
@@ -1723,7 +1752,7 @@ public class ByteEncodeUtil {
 			String insertContent) {
 		// TODO Auto-generated method stub
 
-		StringBuffer s1 = new StringBuffer(javaSrcFileContent); // 原字符串
+		StringBuilder s1 = new StringBuilder(javaSrcFileContent); // 原字符串
 
 		String match = ".*?\\s*class " + simpleClassName + ".*?\\{";
 		Pattern p = Pattern.compile(match); // 插入位置
@@ -1759,7 +1788,7 @@ public class ByteEncodeUtil {
 			String insertContent) {
 		// TODO Auto-generated method stub
 
-		StringBuffer s1 = new StringBuffer(javaSrcFileContent); // 原字符串
+		StringBuilder s1 = new StringBuilder(javaSrcFileContent); // 原字符串
 
 		String match = ".*?\\s*class " + simpleClassName + ".*?\\{";
 		Pattern p = Pattern.compile(match); // 插入位置
@@ -1788,7 +1817,7 @@ public class ByteEncodeUtil {
 	public static String insertPackAage(String simpleClassName, String javaSrcFileContent, String insertContent) {
 		// TODO Auto-generated method stub
 
-		StringBuffer s1 = new StringBuffer(javaSrcFileContent); // 原字符串
+		StringBuilder s1 = new StringBuilder(javaSrcFileContent); // 原字符串
 
 		String match = ".*?\\s*package.*?;";
 		Pattern p = Pattern.compile(match); // 插入位置
@@ -1808,7 +1837,7 @@ public class ByteEncodeUtil {
 
 	{
 
-		StringBuffer sb = new StringBuffer("");
+		StringBuilder sb = new StringBuilder("");
 
 		File file = new File(strPath);
 
@@ -2042,7 +2071,7 @@ public class ByteEncodeUtil {
 			 */
 
 		}
-		StringBuilder sbChars = new StringBuilder();
+		StringBuilder sbChars = new StringBuilder(50);
 		sbChars.append("new int[]{");
 		for (int i = 0; i < ints.length; i++) {
 			chars[i] = (char) ints[i];
@@ -2083,6 +2112,9 @@ public class ByteEncodeUtil {
 				// throw new RuntimeException("发现换行符" + text);
 			}
 		}
+		if (text.indexOf("case ") != -1) {// case里面不能变成那个。 不过主要看模式
+			return true;
+		}
 		if (sIgnoreKeyWords != null) {
 			for (int i = 0; i < sIgnoreKeyWords.length; i++) {
 				String currentKey = sIgnoreKeyWords[i];
@@ -2101,10 +2133,8 @@ public class ByteEncodeUtil {
 			return true;// 表示无需加密
 		}
 
-		if (temp.toLowerCase().contains("ignore_start") 
-				|| temp.toLowerCase().contains("regoin_start")
-				|| temp.toLowerCase().contains("exclude_start")
-				) {
+		if (temp.toLowerCase().contains("ignore_start") || temp.toLowerCase().contains("regoin_start")
+				|| temp.toLowerCase().contains("exclude_start")) {
 			enteIgnoreBlock = true;
 			if (debug.getValue() >= DebugLevel.All.getValue()) {
 				System.out.println("进入忽略忽略区域, " + text);
@@ -2112,7 +2142,8 @@ public class ByteEncodeUtil {
 			return true;
 		}
 
-		if (temp.toLowerCase().contains("ignore_end") || temp.toLowerCase().contains("regoin_end")|| temp.toLowerCase().contains("exclude_end")) {
+		if (temp.toLowerCase().contains("ignore_end") || temp.toLowerCase().contains("regoin_end")
+				|| temp.toLowerCase().contains("exclude_end")) {
 			enteIgnoreBlock = false;
 			if (debug.getValue() >= DebugLevel.All.getValue()) {
 				System.out.println("进入忽略忽略区域, " + text);
