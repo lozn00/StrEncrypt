@@ -181,7 +181,7 @@ public class ByteEncodeUtilMac {
 	 * 通常这里不需要改 只需要 修改moduleType在里面动态赋值即可。每次运行走的那么都是那个个方法
 	 */
 	static EncryptType currentEncryptType = EncryptType.NEWENCRYPT;
-	public static MODULEETYPE moduleType = MODULEETYPE.ROBOT;
+	public static MODULEETYPE moduleType = MODULEETYPE.PLUGIN;
 	/**
 	 * 常量的所在包名
 	 */
@@ -384,6 +384,13 @@ public class ByteEncodeUtilMac {
 
 	protected static void doEncodeAllJava(String path) {
 		File file = new File(path);
+		
+		if(!file.exists()){
+			
+			throw new  RuntimeException("not found file or dir "+file.getAbsolutePath());
+		}
+		
+		System.err.println("无法读取目录"+file.getAbsolutePath()+","+file.isDirectory());
 		if (file.isDirectory() && !isIgnoreFolder(file)) {
 			File[] listFile = file.listFiles();
 			if (listFile != null && listFile.length > 0) {
@@ -602,9 +609,9 @@ public class ByteEncodeUtilMac {
 			// cn.qssq666
 			encryptAtPackage = "cn.qssq666";
 			sConstantsClass = "Values1";
-			sConstantClassPath = "F:/src/git_project/qqrepacket_pro/insertqqmodule/src/main/java/cn/qssq666/insertqqmodule/qssqproguard/a1/"
+			sConstantClassPath = "/Users/aaa/Documents/dev/redpacket/insertqqmodule/src/main/java/cn/qssq666/insertqqmodule/qssqproguard/a1/"
 					+ sConstantsClass + ".java";
-			temp ="F:/src/git_project/qqrepacket_pro/insertqqmodule/src/main/java/cn/qssq666/insertqqmodule/qssqproguard/a1";
+			temp ="/Users/aaa/Documents/dev/redpacket/insertqqmodule/src/main/java/cn/qssq666/insertqqmodule/qssqproguard/a1";
 			list.add(temp);
 		} else if (moduleType == MODULEETYPE.QQ_2_MODULE) {// 加密内置Q文件夹
 			currentEncryptType = EncryptType.NEWENCRYPT;
@@ -754,6 +761,14 @@ public class ByteEncodeUtilMac {
 	 */
 	protected static void doDecodeAllJava(String path) {
 		File file = new File(path);
+		
+		
+		if(!file.exists()){
+			
+			throw new  RuntimeException("not found file or dir "+file.getAbsolutePath());
+		}
+		
+		System.err.println("无法读取目录"+file.getAbsolutePath()+","+file.isDirectory());
 		if (file.isDirectory() && !isIgnoreFolder(file)) {
 			File[] listFile = file.listFiles();
 			if (listFile != null) {
