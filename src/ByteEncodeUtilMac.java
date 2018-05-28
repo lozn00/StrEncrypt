@@ -59,30 +59,6 @@ public class ByteEncodeUtilMac {
 	private static String[] sIgnoresFolder = new String[] {};
 	private static String[] sIgnoresFileNames = new String[] {};
 
-	public static boolean isIgnoreFolder(File file) {
-		if (sIgnoresFolder != null) {
-			for (int i = 0; i < sIgnoresFolder.length; i++) {
-				String current = sIgnoresFolder[i];
-				if (file.isDirectory() && file.getName().equals(current)) {
-					System.out.println("忽略文件" + file.getAbsolutePath() + ",包含" + current);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public static boolean isIgnoreFiles(File file) {
-		if (sIgnoresFileNames != null) {
-			for (int i = 0; i < sIgnoresFileNames.length; i++) {
-				String current = sIgnoresFileNames[i];
-				if (file.getName().equals(current)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 
 	private static final String sIGNORE_DECODE = "IGNORE_DECODE";
 	/*
@@ -188,21 +164,6 @@ public class ByteEncodeUtilMac {
 	private static String sConstantsAtPackage;
 	private static boolean encryptNumber = false;
 
-	/**
-	 * 因为注解必须是常量，所以加密是无意义的，也会报错 但是这个正则只能判断有空号的注解 ，无内容的注解完全可以忽略.
-	 * 
-	 * @return
-	 */
-	public static boolean isAnnotationLine(String line) {// 匹配@()的正则表达式
-		String annotationReg = ".*?\\@\\s*.*?.*?\\).*?";
-		// String annotationReg = "^\\@\\s*.*?\\(.*?\\)\\s*$";
-		Pattern pattern = Pattern.compile(annotationReg);
-		Matcher m = pattern.matcher(line);
-		if (m.find()) {
-			return true;
-		}
-		return false;
-	}
 
 	public static DebugLevel debug = DebugLevel.MIDDLE;
 
@@ -216,7 +177,7 @@ public class ByteEncodeUtilMac {
 		 * return; }
 		 */
 		maxArrLength = 89;
-		boolean encyrpt = 1 % 2 == 0;// 2 represents encrypt 1 represents
+		boolean encyrpt = 1% 2 == 0;// 1 decrypt 2 encrypt
 		// boolean encyrpt=false;
 		if (encyrpt) {
 			encodeJavaAndroid();
@@ -238,6 +199,8 @@ public class ByteEncodeUtilMac {
 			} else {
 				decodeJavaAndroid();
 			}
+			
+			
 		}
 
 		getFileArrayList();
@@ -390,7 +353,7 @@ public class ByteEncodeUtilMac {
 			throw new  RuntimeException("not found file or dir "+file.getAbsolutePath());
 		}
 		
-		System.err.println("无法读取目录"+file.getAbsolutePath()+","+file.isDirectory());
+//		System.err.println("无法读取目录"+file.getAbsolutePath()+","+file.isDirectory());
 		if (file.isDirectory() && !isIgnoreFolder(file)) {
 			File[] listFile = file.listFiles();
 			if (listFile != null && listFile.length > 0) {
@@ -592,6 +555,8 @@ public class ByteEncodeUtilMac {
 					+ sConstantsClass + ".java";
 			temp = "F:/src/git_project/insert_qq_or_wechat/app/src/main/java/com/tencent/qssqproguard/a1";
 			list.add(temp);
+			temp = "F:/src/git_project/insert_qq_or_wechat/app/src/main/java/com/tencent/qssqproguard/a1/MoreUi.java";
+			list.add(temp);
 		} else if (moduleType == MODULEETYPE.QQ_2) {// 加密内置Q文件夹
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			sDecodSimpleClass = "EncryptUtilN";
@@ -604,6 +569,7 @@ public class ByteEncodeUtilMac {
 			list.add(temp);
 
 		} else if (moduleType == MODULEETYPE.QQ_MODULE) {// 加密内置Q文件夹
+			useVarQuote = UseVarQuote.no;
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			sDecodSimpleClass = "EncryptUtilN";
 			// cn.qssq666
@@ -628,7 +594,7 @@ public class ByteEncodeUtilMac {
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			// cn.qssq666
 			encryptAtPackage = "cn.qssq666";
-			temp ="/Users/aaa/Documents/dev/redpacket/insertqqmodule/src/main/java/cn/qssq666/tool/TestEncrypt.java";
+			temp ="/Users/aaa/Documents/dev/redpacket/insertqqmodule/src/main/java/cn/qssq666/insertqqmodule/TestEncrypt.java";
 			sConstantsClass = "Value2";
 			sConstantClassPath = "/Users/aaa/Documents/dev/redpacket/insertqqmodule/src/main/java/cn/qssq666/insertqqmodule/qssqproguard/a2/"
 					+ sConstantsClass + ".java";
@@ -776,6 +742,7 @@ public class ByteEncodeUtilMac {
 					if (listFile[i].isDirectory()) {
 						doDecodeAllJava(listFile[i].getAbsolutePath());
 					} else {
+						System.err.println("处理文件"+file.getAbsolutePath());
 						doDecodeAllJava(listFile[i].getAbsolutePath());
 					}
 				}
@@ -1056,6 +1023,7 @@ public class ByteEncodeUtilMac {
 		String className = getClassNameByFile(filePath);
 		varNameSb.append(getInsertSplitLine(className));
 		File file = filePath;
+		
 		if (file.isDirectory()) {
 			System.out.println("忽略目录 不加载常量" + file.getAbsolutePath());
 		} else if (file.exists() && !file.isDirectory()) { // 判断文件是否存在
@@ -1297,6 +1265,10 @@ public class ByteEncodeUtilMac {
 		try {
 			String encoding = "utf-8";
 			File file = new File(filePath);
+			if(!file.exists()){
+				throw new RuntimeException("文件或者目录不存在"+file.getAbsolutePath());
+			}
+			
 			if (file.isFile() && file.exists()) { // 判断文件是否存在
 				InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);// 考虑到编码格式
 				BufferedReader bufferedReader = new BufferedReader(read);
@@ -1553,6 +1525,10 @@ public class ByteEncodeUtilMac {
 		try {
 			String encoding = "utf-8";
 			File file = new File(filePath);
+			if(!file.exists()){
+				throw new RuntimeException("文件或者目录不存在"+file.getAbsolutePath());
+			}
+			
 			if (file.isFile() && file.exists()) { // 判断文件是否存在
 				InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);// 考虑到编码格式
 				BufferedReader bufferedReader = new BufferedReader(read);
@@ -1573,8 +1549,14 @@ public class ByteEncodeUtilMac {
 						}
 						ignoreCount++;
 					} else {
+						if(debug==DebugLevel.All){
+						System.out.println("正则"+patternString+"开始");
+						}
+							
 						Pattern pattern = Pattern.compile(patternString);
-
+						if(debug==DebugLevel.All){
+							System.out.println("正则"+patternString+"结束");
+							}
 						Matcher matcher = pattern.matcher(lineTxt);
 						while (matcher.find()) {
 							String matchBase = matcher.group();
@@ -1857,7 +1839,10 @@ public class ByteEncodeUtilMac {
 		StringBuilder sb = new StringBuilder("");
 
 		File file = new File(strPath);
-
+		if(!file.exists()){
+			throw new RuntimeException("文件或者目录不存在"+file.getAbsolutePath());
+		}
+		
 		try {
 
 			FileReader fr = new FileReader(file);
@@ -2305,6 +2290,85 @@ public class ByteEncodeUtilMac {
 		String message;
 		boolean result;
 		int code;
+	}
+	
+
+	public static boolean isIgnoreFolder(File file) {
+		if (sIgnoresFolder != null) {
+			for (int i = 0; i < sIgnoresFolder.length; i++) {
+				String current = sIgnoresFolder[i];
+				if (file.isDirectory() && file.getName().equals(current)) {
+					System.out.println("忽略文件" + file.getAbsolutePath() + ",包含" + current);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean isIgnoreFiles(File file) {
+		if (sIgnoresFileNames != null) {
+			for (int i = 0; i < sIgnoresFileNames.length; i++) {
+				String current = sIgnoresFileNames[i];
+				if (file.getName().equals(current)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+
+	/**
+	 * 因为注解必须是常量，所以加密是无意义的，也会报错 但是这个正则只能判断有空号的注解 ，无内容的注解完全可以忽略.
+	 * 
+	 * @return
+	 */
+	public static boolean isAnnotationLine(String line) {// 匹配@()的正则表达式
+		
+		/*if(true){
+			 line="(@(\"fff\")";
+
+			int atStartPosition=line.indexOf("@");
+			int kuohaoLeftPosition=line.indexOf("(");
+			int yinhaoPosition=line.indexOf("\"");
+			int kuohaoRight=line.indexOf(")");
+			if(kuohaoRight>yinhaoPosition&&yinhaoPosition>kuohaoLeftPosition&&kuohaoLeftPosition>atStartPosition){
+				System.out.println("是注解:"+line);
+			}else{
+				System.out.println("不是注解:"+line);
+			}
+			throw new RuntimeException("测试");
+		}*/
+		if(System.getProperties().getProperty("os.name").contains("Mac")){// 死循环了不能那样判断正则.
+//			if()
+			
+			int atStartPosition=line.indexOf("@");
+			int kuohaoLeftPosition=line.indexOf("(");
+			int yinhaoPosition=line.indexOf("\"");
+			int kuohaoRight=line.indexOf(")");
+			if(kuohaoRight>yinhaoPosition&&yinhaoPosition>kuohaoLeftPosition&&kuohaoLeftPosition>atStartPosition){
+				return true;
+			}else{
+				return false;
+			}
+		/*	if(line.contains("@")&&line.contains("(")&&line.contains(")")){
+				System.out.println("是注解"+line+",忽略加密");
+				return true;
+			}else{
+				return false;
+			}*/
+		}else{
+			String annotationReg = ".*?\\@\\s*.*?.*?\\).*?";  //@("")
+			// String annotationReg = "^\\@\\s*.*?\\(.*?\\)\\s*$";
+			Pattern pattern = Pattern.compile(annotationReg);
+			Matcher m = pattern.matcher(line);
+			if (m.find()) {
+				return true;
+			}
+			return false;
+		}
+		
 	}
 
 }
