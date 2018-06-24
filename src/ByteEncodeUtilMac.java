@@ -143,7 +143,7 @@ public class ByteEncodeUtilMac {
 	private final static boolean maxArrWarning = true;
 
 	enum MODULEETYPE {
-		QQ, QQ_2, QQ_MODULE, QQ_2_MODULE, QQ_MODULE_TEST,TEST, WECHAT, PLUGIN, PUBLIC_FOLDER, ROBOT, MIAO, CRACK_SIGN, OTHER, TEST_OTHER_ROBOT, TEST_OTHER_ROBOT_PLUGIN
+		QQ, QQ_2, QQ_MODULE,PLUGIN_NEW, QQ_2_MODULE,QQ_NEW_MODULE_ALL, QQ_MODULE_TEST,TEST, WECHAT, PLUGIN, PUBLIC_FOLDER, ROBOT, MIAO, CRACK_SIGN, OTHER, TEST_OTHER_ROBOT, TEST_OTHER_ROBOT_PLUGIN
 
 	}
 
@@ -157,7 +157,7 @@ public class ByteEncodeUtilMac {
 	 * 通常这里不需要改 只需要 修改moduleType在里面动态赋值即可。每次运行走的那么都是那个个方法
 	 */
 	static EncryptType currentEncryptType = EncryptType.NEWENCRYPT;
-	public static MODULEETYPE moduleType = MODULEETYPE.PLUGIN;
+	public static MODULEETYPE moduleType = MODULEETYPE.QQ_NEW_MODULE_ALL;
 	/**
 	 * 常量的所在包名
 	 */
@@ -177,22 +177,28 @@ public class ByteEncodeUtilMac {
 		 * return; }
 		 */
 		maxArrLength = 89;
-		boolean encyrpt = 1% 2 == 0;// 1 decrypt 2 encrypt
+		boolean encyrpt = 2% 2 == 0;// 1 decrypt 2 encrypt
 		// boolean encyrpt=false;
-		if (encyrpt) {
-			encodeJavaAndroid();
+		
+		
+		
+		if(moduleType==MODULEETYPE.PLUGIN_NEW){
+			moduleType=MODULEETYPE.PLUGIN;
+			if (encyrpt) {
+				encodeJavaAndroid();
 
-		} else {
-			decodeJavaAndroid();
-		}
-		if (moduleType == MODULEETYPE.QQ) {
-			moduleType = MODULEETYPE.QQ_2;
+			} else {
+				decodeJavaAndroid();
+			}
+			
+			moduleType = MODULEETYPE.QQ_MODULE;
 			if (encyrpt) {
 				encodeJavaAndroid();
 			} else {
 				decodeJavaAndroid();
 			}
-		} else if (moduleType == MODULEETYPE.QQ_MODULE) {
+			
+			
 			moduleType = MODULEETYPE.QQ_2_MODULE;
 			if (encyrpt) {
 				encodeJavaAndroid();
@@ -201,7 +207,44 @@ public class ByteEncodeUtilMac {
 			}
 			
 			
+		}else{
+			
+			if (encyrpt) {
+				encodeJavaAndroid();
+
+			} else {
+				decodeJavaAndroid();
+			}
+			
+
+			
+			if (moduleType == MODULEETYPE.QQ) {
+				moduleType = MODULEETYPE.QQ_2;
+				if (encyrpt) {
+					encodeJavaAndroid();
+				} else {
+					decodeJavaAndroid();
+				}
+			} else if (moduleType == MODULEETYPE.QQ_MODULE) {
+				moduleType = MODULEETYPE.QQ_2_MODULE;
+				if (encyrpt) {
+					encodeJavaAndroid();
+				} else {
+					decodeJavaAndroid();
+				}
+				
+				
+			}else if(moduleType==MODULEETYPE.QQ_NEW_MODULE_ALL){
+				moduleType = MODULEETYPE.PLUGIN;
+				if (encyrpt) {
+					encodeJavaAndroid();
+				} else {
+					decodeJavaAndroid();
+				}
+			}
+			
 		}
+		
 
 		getFileArrayList();
 
@@ -589,7 +632,20 @@ public class ByteEncodeUtilMac {
 			temp = "/Users/aaa/Documents/dev/redpacket/insertqqmodule/src/main/java/cn/qssq666/insertqqmodule/qssqproguard/a2";
 			list.add(temp);
 
-		} else if (moduleType == MODULEETYPE.QQ_MODULE_TEST) {// 加密内置Q文件夹
+		}else if (moduleType == MODULEETYPE.QQ_NEW_MODULE_ALL) {// 加密内置Q文件夹
+			currentEncryptType = EncryptType.NEWENCRYPT;
+			// cn.qssq666
+			sDecodSimpleClass = "EncryptUtilN";
+			encryptAtPackage = "cn.qssq666";
+			useVarQuote=UseVarQuote.no;
+			
+			sConstantsClass = "Value2";
+			sConstantClassPath = "/Users/aaa/Documents/dev/redpacket/insertqqmodule/src/main/java/cn/qssq666/insertqqmodule/qssqproguard/a2/"
+					+ sConstantsClass + ".java";
+			temp = "/Users/aaa/Documents/dev/redpacket/insertqqmodule/src/main/java/cn/qssq666/insertqqmodule";
+			list.add(temp);
+
+		}  else if (moduleType == MODULEETYPE.QQ_MODULE_TEST) {// 加密内置Q文件夹
 			useVarQuote=UseVarQuote.no;
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			// cn.qssq666
@@ -2347,6 +2403,15 @@ public class ByteEncodeUtilMac {
 			int kuohaoLeftPosition=line.indexOf("(");
 			int yinhaoPosition=line.indexOf("\"");
 			int kuohaoRight=line.indexOf(")");
+			
+			if(atStartPosition==-1
+					|| kuohaoLeftPosition==-1 
+					|| yinhaoPosition==-1		
+					|| yinhaoPosition==-1
+					||kuohaoRight==-1
+					){
+				return false;
+			}
 			if(kuohaoRight>yinhaoPosition&&yinhaoPosition>kuohaoLeftPosition&&kuohaoLeftPosition>atStartPosition){
 				return true;
 			}else{
