@@ -169,7 +169,7 @@ public class ByteEncodeUtil {
 	private final static boolean maxArrWarning = true;
 
 	enum MODULEETYPE {
-		QQ, QQ_2, QQ_MODULE, QQ_2_MODULE, QQ_MODULE_TEST,TEST, WECHAT, PLUGIN, PUBLIC_FOLDER, ROBOT, MIAO, CRACK_SIGN, OTHER, TEST_OTHER_ROBOT, TEST_OTHER_ROBOT_PLUGIN
+		QQ, QQ_2, QQ_MODULE, QQ_2_MODULE, Q_PLUS_DIR, QQ_PLUS_MODULE_GROUP, QQ_MODULE_TEST, TEST, WECHAT, PLUGIN, PUBLIC_FOLDER, ROBOT, MIAO, CRACK_SIGN, OTHER, TEST_OTHER_ROBOT, TEST_OTHER_ROBOT_PLUGIN
 
 	}
 
@@ -183,7 +183,7 @@ public class ByteEncodeUtil {
 	 * 通常这里不需要改 只需要 修改moduleType在里面动态赋值即可。每次运行走的那么都是那个个方法
 	 */
 	static EncryptType currentEncryptType = EncryptType.NEWENCRYPT;
-	public static MODULEETYPE moduleType = MODULEETYPE.ROBOT;
+	public static MODULEETYPE moduleType = MODULEETYPE.QQ_PLUS_MODULE_GROUP;
 	/**
 	 * 常量的所在包名
 	 */
@@ -218,14 +218,41 @@ public class ByteEncodeUtil {
 		 * return; }
 		 */
 		maxArrLength = 89;
-		boolean encyrpt = 1 % 2 == 0;// 2 represents encrypt 1 represents
+		boolean encyrpt = 2 % 2 == 0;// 2 represents encrypt 1 represents
 		// boolean encyrpt=false;
-		if (encyrpt) {
-			encodeJavaAndroid();
+		
+		if (moduleType == MODULEETYPE.QQ_PLUS_MODULE_GROUP) {
+			moduleType = MODULEETYPE.QQ_MODULE;
+			if (encyrpt) {
+				encodeJavaAndroid();
+			} else {
+				decodeJavaAndroid();
+			}
+			moduleType = MODULEETYPE.QQ_2_MODULE;
+			if (encyrpt) {
+				encodeJavaAndroid();
+			} else {
+				decodeJavaAndroid();
+			}
 
-		} else {
-			decodeJavaAndroid();
+			moduleType = MODULEETYPE.Q_PLUS_DIR;
+			if (encyrpt) {
+				encodeJavaAndroid();
+			} else {
+				decodeJavaAndroid();
+			}
+
+		}else{
+			
+			if (encyrpt) {
+				encodeJavaAndroid();
+
+			} else {
+				decodeJavaAndroid();
+			}
+			
 		}
+		
 		if (moduleType == MODULEETYPE.QQ) {
 			moduleType = MODULEETYPE.QQ_2;
 			if (encyrpt) {
@@ -233,7 +260,7 @@ public class ByteEncodeUtil {
 			} else {
 				decodeJavaAndroid();
 			}
-		} else if (moduleType == MODULEETYPE.QQ_MODULE) {
+		}   else if (moduleType == MODULEETYPE.QQ_MODULE) {
 			moduleType = MODULEETYPE.QQ_2_MODULE;
 			if (encyrpt) {
 				encodeJavaAndroid();
@@ -596,17 +623,19 @@ public class ByteEncodeUtil {
 
 		} else if (moduleType == MODULEETYPE.QQ_MODULE) {// 加密内置Q文件夹
 			currentEncryptType = EncryptType.NEWENCRYPT;
+			useVarQuote = UseVarQuote.no;
 			sDecodSimpleClass = "EncryptUtilN";
 			// cn.qssq666
 			encryptAtPackage = "cn.qssq666";
 			sConstantsClass = "Values1";
 			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a1\\"
 					+ sConstantsClass + ".java";
-			temp ="F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a1";
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a1";
 			list.add(temp);
 		} else if (moduleType == MODULEETYPE.QQ_2_MODULE) {// 加密内置Q文件夹
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			// cn.qssq666
+			useVarQuote = UseVarQuote.no;
 			encryptAtPackage = "cn.qssq666";
 			sConstantsClass = "Value2";
 			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
@@ -614,18 +643,30 @@ public class ByteEncodeUtil {
 			temp = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2";
 			list.add(temp);
 
-		} else if (moduleType == MODULEETYPE.QQ_MODULE_TEST) {// 加密内置Q文件夹
-			useVarQuote=UseVarQuote.no;
+		} else if (moduleType == MODULEETYPE.Q_PLUS_DIR) {// 加密内置Q文件夹
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			// cn.qssq666
 			encryptAtPackage = "cn.qssq666";
-			temp ="F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\tool\\TestEncrypt.java";
+			useVarQuote = UseVarQuote.no;
+			sConstantsClass = "Value2";
+			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
+					+ sConstantsClass + ".java";
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\basehookmodule\\src\\main\\java\\cn\\qssq666";
+			list.add(temp);
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\qplus\\src\\main\\java\\cn\\qssq666";
+			list.add(temp);
+		} else if (moduleType == MODULEETYPE.QQ_MODULE_TEST) {// 加密内置Q文件夹
+			useVarQuote = UseVarQuote.no;
+			currentEncryptType = EncryptType.NEWENCRYPT;
+			// cn.qssq666
+			encryptAtPackage = "cn.qssq666";
+			temp = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\tool\\TestEncrypt.java";
 			sConstantsClass = "Value2";
 			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
 					+ sConstantsClass + ".java";
 			list.add(temp);
 
-		}else if (moduleType == MODULEETYPE.TEST) {
+		} else if (moduleType == MODULEETYPE.TEST) {
 			useVarQuote = UseVarQuote.no;
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			encryptAtPackage = "cn.qssq666";
@@ -716,7 +757,9 @@ public class ByteEncodeUtil {
 			list.add(temp);
 
 		} else {
-
+			if(true){
+				throw new RuntimeException("TYPE ERROR " +moduleType);
+			}
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\util\\robot\\RobotUtil.java";
 			list.add(temp);
 			temp = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\com\\tencent\\mobileqq\\zhengl\\UiUtils.java";
