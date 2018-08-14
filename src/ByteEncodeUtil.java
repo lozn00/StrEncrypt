@@ -181,6 +181,8 @@ public class ByteEncodeUtil {
 	 * 通常这里不需要改 只需要 修改moduleType在里面动态赋值即可。每次运行走的那么都是那个个方法
 	 */
 	static EncryptType currentEncryptType = EncryptType.NEWENCRYPT;
+//	public static MODULEETYPE moduleType = MODULEETYPE.TEST;
+//	public static MODULEETYPE moduleType = MODULEETYPE.ROBOT;
 	public static MODULEETYPE moduleType = MODULEETYPE.QQ_PLUS_MODULE_GROUP;
 	/**
 	 * 常量的所在包名
@@ -216,7 +218,7 @@ public class ByteEncodeUtil {
 		 * return; }
 		 */
 		maxArrLength = 89;
-		boolean encyrpt = 2 % 2 == 0;// 2 represents encrypt 1 represents
+		boolean encyrpt =1% 2 == 0;// 2 represents encrypt 1 represents
 		// boolean encyrpt=false;
 		
 		if (moduleType == MODULEETYPE.QQ_PLUS_MODULE_GROUP) {
@@ -494,23 +496,23 @@ public class ByteEncodeUtil {
 		ArrayList<String> list = new ArrayList<String>();
 		if (moduleType == MODULEETYPE.PLUGIN) {// 加密情插件
 			sConstantsClass = "Constants";
+			sDecodSimpleClass = "EncryptUtilX";
+			sIgnoresFileNames = new String[] {};
+			sConstantsAtPackage = "cn.qssq666.redpacket";
+			useVarQuote = UseVarQuote.no;
+			encryptAtPackage = "cn.qssq666";
 			// sIgnoreKeyWords=new String[]{"TAG"};
 			// sIgnoresFolder = new String[] { "MainHandlerPackage" };
 			// sDecodSimpleClass="EncryptUtil";
-			sDecodSimpleClass = "EncryptUtilX";
-			sIgnoresFileNames = new String[] {};
 			// sIgnoresFileNames = new String[] { "MainHandlerPackage.java" };
 			// sIgnoresFileNames=new
 			// String[]{"MainHandlerPackage.java","MainHandlerPackage"};
 			// fetchDecodeMethod = sDecodSimpleClass + ".decode";
 
-			sConstantsAtPackage = "cn.qssq666.redpacket";
-			encryptAtPackage = "cn.qssq666";
-			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\app\\src\\main\\java\\cn\\qssq666\\redpacket\\Constants.java";
+			sConstantClassPath = "G:\\newproject\\qqrepacket_pro\\app\\src\\main\\java\\cn\\qssq666\\redpacket\\Constants.java";
 			currentEncryptType = EncryptType.OTHERENCRYPT;
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\app\\src\\main\\java\\cn\\qssq666\\redpacket\\";
+			temp = "G:\\newproject\\qqrepacket_pro\\app\\src\\main\\java\\cn\\qssq666\\redpacket\\";
 			list.add(temp);
-			useVarQuote = UseVarQuote.no;
 
 		} else if (moduleType == MODULEETYPE.TEST_OTHER_ROBOT) {
 
@@ -522,7 +524,7 @@ public class ByteEncodeUtil {
 			sConstantsAtPackage = "noconstants";
 			// useVarQuote = false; C0202ooo.o
 			useVarQuote = UseVarQuote.str;// 爆满了代码过长使用随机
-			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\childgit\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
+			sConstantClassPath = "G:\\newproject\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
 			temp = "F:\\QQ_weichat\\crackstr\\classes.dex_src";
 			// temp =
 			// "F:\\QQ_weichat\\crackstr\\classes.dex_src\\com\\luomi\\lm\\morethreads\\db";
@@ -575,10 +577,10 @@ public class ByteEncodeUtil {
 			sConstantsClass = "EncryptConstants";
 			// useVarQuote = false;
 			useVarQuote = UseVarQuote.no;// 爆满了代码过长使用随机
-			sConstantClassPath = "F:\\src\\git_project\\qq_qqrobot\\childgit\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
+			sConstantClassPath = "G:\\newproject\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\constants\\EncryptConstants.java";
 			// temp =
 			// "F:\\src\\git_project\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot\\MainActivity.java";
-			temp = "F:\\src\\git_project\\qq_qqrobot\\childgit\\app\\src\\main\\java\\cn\\qssq666\\robot";
+			temp = "G:\\newproject\\qq_qqrobot\\app\\src\\main\\java\\cn\\qssq666\\robot";
 			list.add(temp);
 			/*
 			 * temp=
@@ -629,9 +631,12 @@ public class ByteEncodeUtil {
 			// cn.qssq666
 			encryptAtPackage = "cn.qssq666";
 			sConstantsClass = "Values1";
-			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a1\\"
+			sConstantClassPath = "G:\\newproject\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a1\\"
 					+ sConstantsClass + ".java";
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a1";
+			temp = "G:\\newproject\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a1";
+			list.add(temp);
+			
+			temp="G:\\newproject\\qqrepacket_pro\\testjniapp\\src\\main\\java\\cn\\qssq666";
 			list.add(temp);
 		} else if (moduleType == MODULEETYPE.QQ_2_MODULE) {// 加密内置Q文件夹
 			currentEncryptType = EncryptType.NEWENCRYPT;
@@ -639,31 +644,49 @@ public class ByteEncodeUtil {
 			useVarQuote = UseVarQuote.no;
 			encryptAtPackage = "cn.qssq666";
 			sConstantsClass = "Value2";
-			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
+			sConstantClassPath = "G:\\newproject\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
 					+ sConstantsClass + ".java";
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2";
+			temp = "G:\\newproject\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2";
 			list.add(temp);
+			
+			
 
-		} else if (moduleType == MODULEETYPE.Q_PLUS_DIR) {// 加密内置Q文件夹
-			currentEncryptType = EncryptType.NEWENCRYPT;
+		} else if (moduleType == MODULEETYPE.Q_PLUS_DIR) {// 
 			// cn.qssq666
+			
+			
+/*			sDecodeMethod = "a7";
+			currentEncryptType = EncryptType.NEWENCRYPT;
+			sDecodSimpleClass = "EncryptUtilX";
 			encryptAtPackage = "cn.qssq666";
 			useVarQuote = UseVarQuote.no;
 			sConstantsClass = "Value2";
-			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
+			*/
+			
+			
+			sDecodSimpleClass = "EncryptUtilX";
+			sIgnoresFileNames = new String[] {};
+			sConstantsAtPackage = "cn.qssq666.redpacket";
+			useVarQuote = UseVarQuote.no;
+			encryptAtPackage = "cn.qssq666";
+				currentEncryptType=EncryptType.OTHERENCRYPT;
+			
+			
+			sConstantClassPath = "G:\\newproject\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
 					+ sConstantsClass + ".java";
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\basehookmodule\\src\\main\\java\\cn\\qssq666";
+			temp = "G:\\newproject\\qqrepacket_pro\\basehookmodule\\src\\main\\java\\cn\\qssq666";
 			list.add(temp);
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\qplus\\src\\main\\java\\cn\\qssq666";
+			temp = "G:\\newproject\\qqrepacket_pro\\qplus\\src\\main\\java\\cn\\qssq666";
 			list.add(temp);
+	
 		} else if (moduleType == MODULEETYPE.QQ_MODULE_TEST) {// 加密内置Q文件夹
 			useVarQuote = UseVarQuote.no;
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			// cn.qssq666
 			encryptAtPackage = "cn.qssq666";
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\tool\\TestEncrypt.java";
+			temp = "G:\\newproject\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\tool\\TestEncrypt.java";
 			sConstantsClass = "Value2";
-			sConstantClassPath = "F:\\src\\git_project\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
+			sConstantClassPath = "G:\\newproject\\qqrepacket_pro\\insertqqmodule\\src\\main\\java\\cn\\qssq666\\insertqqmodule\\qssqproguard\\a2\\"
 					+ sConstantsClass + ".java";
 			list.add(temp);
 
@@ -671,12 +694,15 @@ public class ByteEncodeUtil {
 			useVarQuote = UseVarQuote.no;
 			currentEncryptType = EncryptType.NEWENCRYPT;
 			encryptAtPackage = "cn.qssq666";
+			
+			sDecodeMethod = "a7";
+			sDecodSimpleClass = "EncryptUtilN";
+			
 			sConstantClassPath = "F:\\src\\git_project\\insert_qq_or_wechat\\app\\src\\main\\java\\test\\ConstantValue.java";
 			sConstantsClass = "ConstantValue";
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\testjniapp\\src\\main\\java\\cn\\qssq666\\testjnimodule\\TestVar.java";
+			temp = "G:\\newproject\\qqrepacket_pro\\testjniapp\\src\\main\\java\\cn\\qssq666";
 			list.add(temp);
-			temp = "F:\\src\\git_project\\qqrepacket_pro\\src\\main\\java\\com\\tencent\\mobileqq\\activity\\aio\\SessionInfo.java";
-			list.add(temp);
+			
 
 		} else if (moduleType == MODULEETYPE.WECHAT) {// 插入微信Sscon加密 文件夹批量
 			currentEncryptType = EncryptType.NEWENCRYPT;

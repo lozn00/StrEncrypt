@@ -9,6 +9,8 @@ public class TextUtils {
 
 	public static void main(String[] args) {
 		/*
+		 * 
+		 * 
 		 * short reuslt=0b0011&~0b1100;
 		 * System.out.println(Integer.toBinaryString(reuslt));
 		 * 
@@ -18,6 +20,13 @@ public class TextUtils {
 		 * System.out.println(value);
 		 */
 
+		
+		if(true){
+			  String regex = ".*?[0-9]{5,12}.*?";
+//			  String regex = "^[a-z0-9A-Z\u4e00-\u9fa5]+$";
+			  System.out.println( "是否包含qq,或者手机号码 333333".matches(regex));
+			  return;
+		}
 	 int MODE_SHIFT = 30;
 	 int MODE_MASK = 0x3 << MODE_SHIFT;
 		// 0x3 左移动30位=01 00 0000 0000 0000 0000 000
