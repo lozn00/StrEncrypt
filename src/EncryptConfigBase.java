@@ -1,5 +1,5 @@
 
-public class EncryptConfig {
+public class EncryptConfigBase {
 	private boolean allowConstantsEmpty;
 
 	public boolean isAllowConstantsEmpty() {

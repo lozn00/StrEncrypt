@@ -23,6 +23,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import newencrypt.StrEngC0202ooo;
+import tools.HanyuPinyinHelper;
+import tools.MD5Util;
 
 //TODO 下次增加自动清空常量class已经申明的变量功能。
 /**
@@ -55,7 +57,7 @@ public class ByteEncodeUtilMac {
 	 */
 	static HashMap<String, String> sDecodeMap = new HashMap<>();
 	static ArrayList<String> sIgnoreFileList = new ArrayList<>();
-	public static EncryptConfig encryptConfig = new EncryptConfig();
+	public static EncryptConfigBase encryptConfig = new EncryptConfigBase();
 	private static String[] sIgnoresFolder = new String[] {};
 	private static String[] sIgnoresFileNames = new String[] {};
 
